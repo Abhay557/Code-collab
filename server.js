@@ -5,6 +5,11 @@ const { Server } = require('socket.io');
 const rateLimit = require('express-rate-limit');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
+
+try {
+    fs.writeFileSync('debug_extraction.log', `SERVER STARTUP AT ${new Date().toISOString()}\n`);
+} catch (e) { console.error('Failed to write debug log', e); }
 
 const PORT = process.env.PORT || 3000;
 
@@ -90,19 +95,28 @@ app.get('/api/rooms/:id', (req, res) => {
 
 // ─── AI Response Parser ───────────────────────────────────────────────
 // ─── AI Response Parser ───────────────────────────────────────────────
+
 function parseCodeBlocks(text) {
     console.log('--- RAW AI RESPONSE ---');
     console.log(text);
     console.log('-----------------------');
 
+    // Write to debug file
+    try {
+        fs.writeFileSync('debug_ai_response.txt', text);
+    } catch (e) {
+        console.error('Failed to write debug file:', e);
+    }
+
     const result = { html: null, css: null, js: null };
 
-    // Match fenced code blocks: ```lang\n...code...\n```
-    // Improved regex: optional language, handles whitespace better
+    // 1. Try matching fenced code blocks: ```lang\n...code...\n```
     const blockRegex = /```(\w*)\s*\n([\s\S]*?)```/g;
     let match;
+    let foundFences = false;
 
     while ((match = blockRegex.exec(text)) !== null) {
+        foundFences = true;
         let lang = match[1].toLowerCase().trim();
         const code = match[2].trim();
 
@@ -113,27 +127,139 @@ function parseCodeBlocks(text) {
         } else if (lang === 'js' || lang === 'javascript') {
             result.js = code;
         } else if (lang === '') {
-            // If no language specified, try to guess or default to HTML if it looks like HTML
-            if (code.trim().startsWith('<')) {
-                result.html = code;
-            } else if (code.includes('{') && code.includes(':')) {
-                result.css = code;
-            } else {
-                result.js = code;
+            if (code.trim().startsWith('<')) result.html = code;
+            else if (code.includes('{') && code.includes(':')) result.css = code;
+            else result.js = code;
+        }
+    }
+
+    // 2. Fallback: If no fences, try extraction from raw text
+    if (!foundFences) {
+        console.log('No code fences found. Attempting extraction...');
+        let remainingText = text;
+
+        // Extract CSS from <style>...</style> (Case-insensitive, multiline)
+        const styleMatch = remainingText.match(/<style[^>]*>([\s\S]*?)<\/style>/i);
+        if (styleMatch) {
+            result.css = styleMatch[1].trim();
+            // Remove the style block from text so it doesn't get grabbed by HTML parser
+            remainingText = remainingText.replace(/<style[^>]*>[\s\S]*?<\/style>/i, '');
+        }
+
+        // Extract JS from <script>...</script> (ignoring scripts with src)
+        const scriptMatch = remainingText.match(/<script(?![^>]*src=)[^>]*>([\s\S]*?)<\/script>/i);
+        if (scriptMatch) {
+            result.js = scriptMatch[1].trim();
+            remainingText = remainingText.replace(/<script(?![^>]*src=)[^>]*>[\s\S]*?<\/script>/i, '');
+        }
+
+        // 3. Try Section Headers on remaining text (e.g. "HTML:", "**CSS**")
+        if (result.html === null) {
+            const htmlMatch = remainingText.match(/(?:^|\n)(?:\*\*|#+\s*)?HTML(?:\*\*|:)?(?:\s*\n|\s+)([\s\S]*?)(?=(?:^|\n)(?:\*\*|#+\s*)?(?:CSS|JS|JAVASCRIPT)|$)/i);
+            if (htmlMatch) {
+                result.html = htmlMatch[1].trim();
             }
         }
     }
 
-    // Fallback: if no code blocks found, and text looks like code, assign it
+    // 4. Final Fallback: Treat entire text as HTML
     if (result.html === null && result.css === null && result.js === null) {
         const trimmed = text.trim();
-        if (trimmed.startsWith('<')) {
-            result.html = trimmed;
-        } else {
-            // Default fallback
-            console.log('No code blocks found, fallback to HTML for entire text');
+        if (trimmed.startsWith('<')) result.html = trimmed;
+    }
+
+    // 5. Post-Processing: Extract embedded <style> and <script> from result.html
+    if (result.html) {
+        // Log to file for debugging
+        try {
+            fs.appendFileSync('debug_extraction.log', `\n--- NEW POST-PROCESSING ---\nHTML Length: ${result.html.length}\n`);
+        } catch (e) { }
+
+        // Extract ALL CSS
+        while (true) {
+            // Lenient regex: allows missing </style> if followed by </head>, </body>, </html>, or End of String
+            const styleMatch = result.html.match(/<style[^>]*>([\s\S]*?)(?:<\/style>|(?=<\/head>|<\/body>|<\/html>|$))/i);
+            if (!styleMatch) break;
+
+            try { fs.appendFileSync('debug_extraction.log', `Found style at index ${styleMatch.index}\n`); } catch (e) { }
+
+            const cssContent = styleMatch[1].trim();
+            if (cssContent) {
+                result.css = (result.css ? result.css + '\n\n' : '') + cssContent;
+            }
+            // Safe removal using substring (avoids regex replacement issues)
+            const before = result.html.substring(0, styleMatch.index);
+            const after = result.html.substring(styleMatch.index + styleMatch[0].length);
+            result.html = (before + after).trim();
+        }
+
+        // Extract ALL JS
+        while (true) {
+            // Lenient regex: allows missing </script> if followed by </body>, </html>, or End of String
+            const scriptMatch = result.html.match(/<script(?![^>]*src=)[^>]*>([\s\S]*?)(?:<\/script>|(?=<\/body>|<\/html>|$))/i);
+            if (!scriptMatch) break;
+
+            try { fs.appendFileSync('debug_extraction.log', `Found script at index ${scriptMatch.index}\n`); } catch (e) { }
+
+            const jsContent = scriptMatch[1].trim();
+            if (jsContent) {
+                result.js = (result.js ? result.js + '\n\n' : '') + jsContent;
+            }
+            // Safe removal using substring
+            const before = result.html.substring(0, scriptMatch.index);
+            const after = result.html.substring(scriptMatch.index + scriptMatch[0].length);
+            result.html = (before + after).trim();
         }
     }
+
+    // 6. Clean up code blocks
+    const cleanCode = (code, type) => {
+        if (!code) return null;
+
+        // Strip wrapper tags for HTML
+        if (type === 'html') {
+            // Remove <body> wrappers (standard and AI hallucinations like <body content-only>)
+            code = code.replace(/<body[^>]*>/i, '').replace(/<\/body>/i, '');
+            // Remove <html> wrappers
+            code = code.replace(/<html[^>]*>/i, '').replace(/<\/html>/i, '');
+            // Remove <head> wrappers
+            code = code.replace(/<head[^>]*>/i, '').replace(/<\/head>/i, '');
+        }
+
+        // Strip chatty command lines at start
+        const lines = code.split('\n');
+        let startIndex = 0;
+
+        // Log first line bytes for debugging
+        if (lines.length > 0) {
+            const firstLine = lines[0].trim();
+            const hex = Buffer.from(firstLine).toString('hex');
+            try {
+                const logPath = path.join(__dirname, 'debug_extraction.log');
+                fs.appendFileSync(logPath, `CleanCode Check: "${firstLine}" Hex: ${hex}\n`);
+            } catch (e) { }
+        }
+
+        while (startIndex < lines.length) {
+            const line = lines[startIndex].trim();
+            if (!line) {
+                startIndex++;
+                continue;
+            }
+            // Skip lines starting with ( or Note: or Here is... AND aggressive filter for known bad strings
+            if (line.startsWith('(') || line.startsWith('Note:') || line.match(/^Here is/i) || line.match(/^Sure,/i) ||
+                line.match(/body content only/i) || line.match(/no html\/head\/body tags/i)) {
+                startIndex++;
+            } else {
+                break;
+            }
+        }
+        return lines.slice(startIndex).join('\n').trim();
+    };
+
+    result.html = cleanCode(result.html, 'html');
+    result.css = cleanCode(result.css, 'css');
+    result.js = cleanCode(result.js, 'js');
 
     console.log('--- PARSED RESULT ---');
     console.log(result);
