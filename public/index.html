@@ -1,0 +1,1715 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Collab - Real-time Collaborative IDE</title>
+
+    <meta property="og:title" content="Code Collab - Real-time Collaborative Editor">
+    <meta property="og:description"
+        content="A free, in-browser tool for pair programming and live code sharing. No sign-up required.">
+    <meta property="og:image"
+        content="https://raw.githubusercontent.com/Abhay557/Code-Collab/refs/heads/main/preview2.png">
+    <meta property="og:url"
+        content="https://www.linkedin.com/posts/abhay557_webdevelopment-opensource-firebase-activity-7385344279336067073-6lwO?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAAEW4kzUBoGX2tCAhI_tvW_kfJtgr1f106kw">
+    <meta property="og:type" content="website">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'Courier New', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- CodeMirror for Syntax Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/codemirror.min.css">
+    <!-- CodeMirror Themes -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/theme/material-darker.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/theme/dracula.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/theme/monokai.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/theme/nord.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/theme/ayu-dark.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/theme/cobalt.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/theme/twilight.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/theme/solarized.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/xml/xml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/css/css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/edit/closetag.min.js"></script>
+
+    <!-- JSZip for Downloading Code -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+    <!-- Socket.IO Client -->
+    <script src="/socket.io/socket.io.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        /* ─── Animated Gradient Background ─── */
+        .bg-mesh {
+            background: #0a0e1a;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bg-mesh::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(99, 102, 241, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(139, 92, 246, 0.10) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 80%, rgba(14, 165, 233, 0.08) 0%, transparent 50%);
+            animation: meshMove 20s ease-in-out infinite;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        @keyframes meshMove {
+
+            0%,
+            100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+
+            33% {
+                transform: translate(2%, -1%) rotate(1deg);
+            }
+
+            66% {
+                transform: translate(-1%, 2%) rotate(-1deg);
+            }
+        }
+
+        /* ─── Glass Card ─── */
+        .glass-card {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(99, 102, 241, 0.15);
+            box-shadow:
+                0 0 0 1px rgba(255, 255, 255, 0.03),
+                0 25px 50px -12px rgba(0, 0, 0, 0.5),
+                0 0 80px -20px rgba(99, 102, 241, 0.15);
+        }
+
+        /* ─── Modal Glass ─── */
+        .glass-modal {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            box-shadow:
+                0 25px 50px -12px rgba(0, 0, 0, 0.5),
+                0 0 80px -20px rgba(99, 102, 241, 0.2);
+        }
+
+        /* ─── Gradient Buttons ─── */
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px -3px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 25px -5px rgba(99, 102, 241, 0.5);
+            filter: brightness(1.1);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(51, 65, 85, 0.8);
+            border-color: rgba(100, 116, 139, 0.5);
+            transform: translateY(-1px);
+        }
+
+        .btn-accent {
+            background: linear-gradient(135deg, #0d9488 0%, #0ea5e9 100%);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px -3px rgba(14, 165, 233, 0.35);
+        }
+
+        .btn-accent:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 25px -5px rgba(14, 165, 233, 0.45);
+            filter: brightness(1.1);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #dc2626 0%, #e11d48 100%);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.1);
+        }
+
+        /* ─── Input Premium ─── */
+        .input-premium {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(100, 116, 139, 0.25);
+            transition: all 0.2s ease;
+        }
+
+        .input-premium:focus {
+            border-color: rgba(99, 102, 241, 0.6);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+            outline: none;
+        }
+
+        /* ─── Divider ─── */
+        .divider-fancy {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .divider-fancy::before,
+        .divider-fancy::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(100, 116, 139, 0.3), transparent);
+        }
+
+        /* ─── Feature Badges ─── */
+        .feature-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            border-radius: 9999px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        /* ─── Floating Particles (decorative) ─── */
+        .floating-dot {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.15;
+            animation: floatDot 6s ease-in-out infinite;
+        }
+
+        @keyframes floatDot {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-15px);
+            }
+        }
+
+        /* ─── Editor Header Glass ─── */
+        .header-glass {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(99, 102, 241, 0.1);
+        }
+
+        /* ─── Scrollbar ─── */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+
+        /* ─── CodeMirror ─── */
+        .CodeMirror {
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            height: 100%;
+            font-size: 13px;
+        }
+
+        .CodeMirror-gutters {
+            background-color: #0f172a !important;
+            border-right: 1px solid rgba(100, 116, 139, 0.15) !important;
+        }
+
+        .console-log {
+            color: #e2e8f0;
+        }
+
+        .console-error {
+            color: #fb7185;
+        }
+
+        .console-warn {
+            color: #fbbf24;
+        }
+
+        .console-info {
+            color: #38bdf8;
+        }
+
+        /* ─── Resizer ─── */
+        .resizer {
+            background: rgba(99, 102, 241, 0.2);
+            width: 3px;
+            cursor: col-resize;
+            flex-shrink: 0;
+            z-index: 10;
+            border-radius: 3px;
+            transition: background 0.2s;
+        }
+
+        .resizer:hover {
+            background: rgba(99, 102, 241, 0.5);
+        }
+
+        /* ─── AI Panel ─── */
+        .ai-prompt-bubble {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            border-radius: 12px;
+            padding: 8px 12px;
+            margin-bottom: 8px;
+        }
+
+        .ai-response-bubble {
+            background: rgba(30, 41, 59, 0.8);
+            border-left: 3px solid #10b981;
+            border-radius: 0 12px 12px 0;
+            padding: 8px 12px;
+            margin-bottom: 8px;
+        }
+
+        .ai-spinner {
+            border: 3px solid rgba(30, 41, 59, 0.8);
+            border-top: 3px solid #818cf8;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 0.8s linear infinite;
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ─── Smooth Fade In ─── */
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ─── Notification ─── */
+        .notif-toast {
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* ─── Home Navbar ─── */
+        .home-nav {
+            background: rgba(10, 14, 26, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(100, 116, 139, 0.1);
+        }
+
+        .nav-link {
+            color: #94a3b8;
+            font-size: 0.8rem;
+            font-weight: 500;
+            padding: 6px 12px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover {
+            color: #e2e8f0;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* ─── Hero Section ─── */
+        .hero-section {
+            min-height: calc(100vh - 56px);
+            display: flex;
+            align-items: center;
+            padding: 40px clamp(24px, 5vw, 80px);
+            gap: 60px;
+        }
+
+        .hero-left {
+            flex: 1;
+            max-width: 560px;
+        }
+
+        .hero-right {
+            flex: 1;
+            max-width: 680px;
+            position: relative;
+        }
+
+        /* ─── Code Editor Mockup ─── */
+        .code-mockup {
+            background: #1a1e2e;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(100, 116, 139, 0.15);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .code-mockup-tab {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #94a3b8;
+            background: #141824;
+            border-bottom: 1px solid rgba(100, 116, 139, 0.1);
+        }
+
+        .code-mockup-tab .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+        }
+
+        .code-mockup-body {
+            padding: 14px 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            line-height: 1.7;
+            color: #94a3b8;
+            min-height: 80px;
+        }
+
+        .code-mockup-body .kw {
+            color: #c792ea;
+        }
+
+        .code-mockup-body .fn {
+            color: #82aaff;
+        }
+
+        .code-mockup-body .str {
+            color: #c3e88d;
+        }
+
+        .code-mockup-body .tag {
+            color: #f07178;
+        }
+
+        .code-mockup-body .attr {
+            color: #ffcb6b;
+        }
+
+        .code-mockup-body .cm {
+            color: #546e7a;
+        }
+
+        .code-mockup-body .num {
+            color: #f78c6c;
+        }
+
+        .code-mockup-body .prop {
+            color: #80cbc4;
+        }
+
+        /* ─── Feature Cards ─── */
+        .feature-card {
+            background: rgba(20, 24, 36, 0.8);
+            border: 1px solid rgba(100, 116, 139, 0.12);
+            border-radius: 16px;
+            padding: 28px 24px;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            border-color: rgba(99, 102, 241, 0.25);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px -10px rgba(0, 0, 0, 0.4);
+        }
+
+        .feature-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        /* ─── Decorative Gradient Bars ─── */
+        .gradient-bar {
+            position: absolute;
+            border-radius: 999px;
+            pointer-events: none;
+        }
+
+        /* ─── Bottom Section ─── */
+        .features-section {
+            background: rgba(10, 14, 26, 0.6);
+            border-top: 1px solid rgba(100, 116, 139, 0.08);
+            padding: 60px clamp(24px, 5vw, 80px);
+        }
+
+        @media (max-width: 768px) {
+            .hero-section {
+                flex-direction: column;
+                min-height: auto;
+                padding-top: 48px;
+            }
+
+            .hero-left {
+                max-width: 100%;
+            }
+
+            .hero-right {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-mesh text-white font-sans antialiased">
+
+    <div id="notification"
+        class="hidden fixed top-5 right-5 text-white py-3 px-5 rounded-xl shadow-2xl z-50 notif-toast transition-all duration-300">
+    </div>
+
+    <!-- App Container -->
+    <div id="app" class="min-h-screen flex flex-col relative z-10">
+
+        <!-- Home View -->
+        <div id="home-view" class="flex-grow flex flex-col">
+
+            <!-- Top Navigation Bar -->
+            <nav class="home-nav px-6 py-3 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <div
+                        class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                        </svg>
+                    </div>
+                    <span class="font-bold text-white text-sm">Code Collab</span>
+                </div>
+                <div class="flex items-center gap-1">
+                    <a href="https://github.com/Abhay557/Code-Collab" target="_blank" rel="noopener noreferrer"
+                        class="nav-link flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                            <path fill-rule="evenodd"
+                                d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.168 6.839 9.492.5.092.682-.217.682-.482 0-.237-.009-.868-.014-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.031-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.03 1.595 1.03 2.688 0 3.848-2.338 4.695-4.566 4.942.359.308.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.001 10.001 0 0022 12c0-5.523-4.477-10-10-10z"
+                                clip-rule="evenodd" />
+                        </svg>
+                        GitHub
+                    </a>
+                    <a href="https://discord.gg/f2vvuz3ZEw" target="_blank" rel="noopener noreferrer"
+                        class="nav-link flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 16 16">
+                            <path
+                                d="M13.545 2.907a13.227 13.227 0 0 0-3.257-1.011.05.05 0 0 0-.052.025c-.141.25-.297.577-.406.833a12.19 12.19 0 0 0-3.658 0 8.258 8.258 0 0 0-.412-.833.051.051 0 0 0-.052-.025c-1.125.194-2.22.534-3.257 1.011a.041.041 0 0 0-.021.018C.356 6.024-.213 9.047.066 12.032c.001.014.01.028.021.037a13.276 13.276 0 0 0 3.995 2.02.05.05 0 0 0 .056-.019c.308-.42.582-.863.818-1.329a.05.05 0 0 0-.01-.059.051.051 0 0 0-.018-.011 8.875 8.875 0 0 1-1.248-.595.05.05 0 0 1-.02-.066.051.051 0 0 1 .015-.019c.084-.063.168-.129.248-.195a.05.05 0 0 1 .051-.007c2.619 1.165 5.48 1.165 8.1 0a.05.05 0 0 1 .053.007c.08.066.164.132.248.195a.051.051 0 0 1 .015.019.05.05 0 0 1-.02.066 8.875 8.875 0 0 1-1.248.595.05.05 0 0 0-.01.059c.236.466.51.899.818 1.329a.05.05 0 0 0 .056.019 13.235 13.235 0 0 0 4.001-2.02.049.049 0 0 0 .021-.037c.276-2.986-.42-6.008-1.99-9.125a.043.043 0 0 0-.02-.019Z" />
+                        </svg>
+                        Discord
+                    </a>
+                    <button id="create-public-room-btn"
+                        class="btn-primary text-white font-semibold py-1.5 px-4 rounded-lg text-xs ml-2">Start
+                        Coding</button>
+                </div>
+            </nav>
+
+            <!-- Hero Section -->
+            <div class="hero-section fade-in">
+                <!-- Left: Headline + Actions -->
+                <div class="hero-left">
+                    <h1 class="text-4xl md:text-5xl font-extrabold leading-tight tracking-tight mb-5">
+                        The best place to
+                        <span
+                            class="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">build,
+                            test,</span>
+                        and
+                        <span
+                            class="bg-gradient-to-r from-sky-400 to-teal-400 bg-clip-text text-transparent">collaborate</span>
+                        on code.
+                    </h1>
+                    <p class="text-slate-400 text-base leading-relaxed mb-8 max-w-md">
+                        Code Collab is a <strong class="text-slate-200">real-time collaborative IDE</strong> for
+                        front-end developers.
+                        Build together, preview instantly, and get <strong class="text-slate-200">AI-powered</strong>
+                        code assistance — no sign-up required.
+                    </p>
+
+                    <div class="flex flex-wrap items-center gap-3 mb-8">
+                        <button id="create-private-room-btn"
+                            class="btn-secondary text-white font-semibold py-3 px-6 rounded-xl text-sm flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            </svg>
+                            Create Private Room
+                        </button>
+                        <button id="join-random-btn"
+                            class="btn-accent text-white font-semibold py-3 px-6 rounded-xl text-sm flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                            Join Random Room
+                        </button>
+                    </div>
+
+                    <!-- Join by ID (inline) -->
+                    <div class="flex items-center gap-2 max-w-md">
+                        <input type="text" id="room-id-input" placeholder="Paste Room ID..."
+                            class="input-premium flex-grow text-white px-4 py-2.5 rounded-xl text-sm font-mono tracking-wider placeholder-slate-500">
+                        <button id="join-room-btn"
+                            class="btn-secondary text-white font-semibold py-2.5 px-5 rounded-xl text-sm whitespace-nowrap">Join</button>
+                    </div>
+                </div>
+
+                <!-- Right: Code Editor + AI Mockup -->
+                <div class="hero-right hidden md:block">
+                    <!-- Decorative gradient bars -->
+                    <div class="gradient-bar w-32 h-2 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 -top-4 right-12 opacity-60"
+                        style="position:absolute;"></div>
+                    <div class="gradient-bar w-20 h-1.5 rounded-full bg-gradient-to-r from-teal-400 to-sky-400 -bottom-3 left-8 opacity-50"
+                        style="position:absolute;"></div>
+
+                    <div class="flex gap-4">
+                        <!-- Left column: Code Panels -->
+                        <div class="flex-1 min-w-0">
+                            <!-- HTML Panel -->
+                            <div class="code-mockup mb-3 shadow-2xl">
+                                <div class="code-mockup-tab">
+                                    <div class="dot bg-red-500"></div>
+                                    <div class="dot bg-yellow-500"></div>
+                                    <div class="dot bg-green-500"></div>
+                                    <span class="ml-2">HTML</span>
+                                </div>
+                                <div class="code-mockup-body">
+                                    <span class="cm">&lt;!-- Code Collab --&gt;</span><br>
+                                    &lt;<span class="tag">div</span> <span class="attr">class</span>=<span
+                                        class="str">"container"</span>&gt;<br>
+                                    &nbsp;&nbsp;&lt;<span class="tag">h1</span>&gt;Hello World&lt;/<span
+                                        class="tag">h1</span>&gt;<br>
+                                    &lt;/<span class="tag">div</span>&gt;
+                                </div>
+                            </div>
+
+                            <!-- CSS Panel -->
+                            <div class="code-mockup mb-3 shadow-2xl">
+                                <div class="code-mockup-tab">
+                                    <div class="dot bg-red-500"></div>
+                                    <div class="dot bg-yellow-500"></div>
+                                    <div class="dot bg-green-500"></div>
+                                    <span class="ml-2">CSS</span>
+                                </div>
+                                <div class="code-mockup-body">
+                                    <span class="tag">.container</span> {<br>
+                                    &nbsp;&nbsp;<span class="prop">background</span>: <span
+                                        class="fn">linear-gradient</span>(<br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="num">135deg</span>,<br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="str">#6366f1</span>, <span
+                                        class="str">#8b5cf6</span><br>
+                                    &nbsp;&nbsp;);<br>
+                                    }
+                                </div>
+                            </div>
+
+                            <!-- JS Panel -->
+                            <div class="code-mockup shadow-2xl">
+                                <div class="code-mockup-tab">
+                                    <div class="dot bg-red-500"></div>
+                                    <div class="dot bg-yellow-500"></div>
+                                    <div class="dot bg-green-500"></div>
+                                    <span class="ml-2">JavaScript</span>
+                                </div>
+                                <div class="code-mockup-body">
+                                    <span class="kw">const</span> <span class="fn">colors</span> =<br>
+                                    &nbsp;&nbsp;[<span class="str">"#6366f1"</span>, <span class="str">"#8b5cf6"</span>,
+                                    <span class="str">"#a855f7"</span>];<br><br>
+                                    <span class="kw">function</span> <span class="fn">animate</span>() { <span
+                                        class="cm">/* ...
+                                        */</span> }
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right column: AI Assistant Panel -->
+                        <div class="flex-1 min-w-0">
+                            <div class="code-mockup shadow-2xl h-full flex flex-col"
+                                style="border-color: rgba(139, 92, 246, 0.2);">
+                                <div class="code-mockup-tab"
+                                    style="background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(139,92,246,0.15));">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-purple-400"
+                                        viewBox="0 0 20 20" fill="currentColor">
+                                        <path
+                                            d="M10 2a1 1 0 011 1v1.323l3.954 1.582 1.599-.8a1 1 0 01.894 1.79l-1.233.616 1.738 5.42a1 1 0 01-.285 1.05A3.989 3.989 0 0114 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.715-5.349L10 6.477l-2.763 1.105 1.715 5.349a1 1 0 01-.285 1.05A3.989 3.989 0 016 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.738-5.42-1.233-.617a1 1 0 01.894-1.789l1.599.799L10 4.323V3a1 1 0 011-1z" />
+                                    </svg>
+                                    <span class="text-purple-300 font-semibold">AI Assistant</span>
+                                </div>
+                                <div class="p-3 space-y-2.5 flex-grow">
+                                    <!-- User prompt -->
+                                    <div class="ai-prompt-bubble text-white text-xs"
+                                        style="border-radius:8px; padding:6px 10px;">
+                                        <div class="text-white/50 text-[10px] mb-0.5 font-medium">You</div>
+                                        Build me a neon button with hover glow
+                                    </div>
+                                    <!-- AI response -->
+                                    <div class="ai-response-bubble text-xs"
+                                        style="border-radius: 0 8px 8px 0; padding: 6px 10px;">
+                                        <div
+                                            class="text-emerald-400 text-[10px] mb-1 font-medium flex items-center gap-1">
+                                            <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20">
+                                                <path
+                                                    d="M10 2a1 1 0 011 1v1.323l3.954 1.582 1.599-.8a1 1 0 01.894 1.79l-1.233.616 1.738 5.42a1 1 0 01-.285 1.05A3.989 3.989 0 0114 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.715-5.349L10 6.477l-2.763 1.105 1.715 5.349a1 1 0 01-.285 1.05A3.989 3.989 0 016 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.738-5.42-1.233-.617a1 1 0 01.894-1.789l1.599.799L10 4.323V3a1 1 0 011-1z" />
+                                            </svg>
+                                            AI Generated
+                                        </div>
+                                        <div
+                                            style="font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; line-height: 1.55; color: #94a3b8;">
+                                            <span class="tag">.neon-btn</span> {<br>
+                                            &nbsp;&nbsp;<span class="prop">border</span>: <span class="num">2px</span>
+                                            <span class="kw">solid</span> <span class="str">#0ff</span>;<br>
+                                            &nbsp;&nbsp;<span class="prop">color</span>: <span
+                                                class="str">#0ff</span>;<br>
+                                            &nbsp;&nbsp;<span class="prop">text-shadow</span>: <span class="num">0 0
+                                                8px</span> <span class="str">#0ff</span>;<br>
+                                            }<br>
+                                            <span class="tag">.neon-btn</span><span class="fn">:hover</span> {<br>
+                                            &nbsp;&nbsp;<span class="prop">background</span>: <span
+                                                class="str">#0ff</span>;<br>
+                                            &nbsp;&nbsp;<span class="prop">box-shadow</span>:<br>
+                                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="num">0 0 20px</span> <span
+                                                class="str">#0ff</span>;<br>
+                                            }
+                                        </div>
+                                    </div>
+                                    <!-- Fake input -->
+                                    <div class="flex gap-2">
+                                        <div
+                                            class="flex-grow bg-slate-800/60 border border-slate-700/40 rounded-lg px-2.5 py-1.5 text-slate-500 text-[11px]">
+                                            Describe what to build...</div>
+                                        <div
+                                            class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg px-2 py-1.5 flex items-center justify-center cursor-pointer">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-white"
+                                                viewBox="0 0 20 20" fill="currentColor">
+                                                <path
+                                                    d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.428A1 1 0 009 15.571V10a1 1 0 112 0v5.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Feature Showcase -->
+            <div class="py-16 px-6 md:px-20">
+                <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center gap-12">
+
+                    <!-- Left: Text -->
+                    <div class="flex-1 space-y-4">
+                        <div
+                            class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-semibold uppercase tracking-wider mb-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20"
+                                fill="currentColor">
+                                <path
+                                    d="M10 2a1 1 0 011 1v1.323l3.954 1.582 1.599-.8a1 1 0 01.894 1.79l-1.233.616 1.738 5.42a1 1 0 01-.285 1.05A3.989 3.989 0 0114 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.715-5.349L10 6.477l-2.763 1.105 1.715 5.349a1 1 0 01-.285 1.05A3.989 3.989 0 016 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.738-5.42-1.233-.617a1 1 0 01.894-1.789l1.599.799L10 4.323V3a1 1 0 011-1z" />
+                            </svg>
+                            AI-Powered
+                        </div>
+                        <h2 class="text-3xl md:text-4xl font-extrabold leading-tight">
+                            Just describe it.<br>
+                            <span class="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">AI
+                                writes the code.</span>
+                        </h2>
+                        <p class="text-slate-400 text-sm leading-relaxed max-w-md">
+                            Type a prompt, and the AI assistant generates complete <strong class="text-slate-200">HTML,
+                                CSS & JavaScript</strong>.
+                            It reads your existing code and console output for context-aware debugging and code
+                            generation.
+                        </p>
+                        <div class="flex items-center gap-4 pt-2">
+                            <div class="flex items-center gap-2 text-xs text-slate-500">
+                                <div class="w-1.5 h-1.5 rounded-full bg-emerald-400"></div>
+                                Context-aware
+                            </div>
+                            <div class="flex items-center gap-2 text-xs text-slate-500">
+                                <div class="w-1.5 h-1.5 rounded-full bg-emerald-400"></div>
+                                Console debugging
+                            </div>
+                            <div class="flex items-center gap-2 text-xs text-slate-500">
+                                <div class="w-1.5 h-1.5 rounded-full bg-emerald-400"></div>
+                                Multi-file output
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: AI Chat Mockup -->
+                    <div class="flex-1 max-w-md w-full">
+                        <div class="code-mockup">
+                            <div class="code-mockup-tab">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-purple-400"
+                                    viewBox="0 0 20 20" fill="currentColor">
+                                    <path
+                                        d="M10 2a1 1 0 011 1v1.323l3.954 1.582 1.599-.8a1 1 0 01.894 1.79l-1.233.616 1.738 5.42a1 1 0 01-.285 1.05A3.989 3.989 0 0114 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.715-5.349L10 6.477l-2.763 1.105 1.715 5.349a1 1 0 01-.285 1.05A3.989 3.989 0 016 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.738-5.42-1.233-.617a1 1 0 01.894-1.789l1.599.799L10 4.323V3a1 1 0 011-1z" />
+                                </svg>
+                                <span class="text-purple-300">AI Assistant</span>
+                            </div>
+                            <div class="p-4 space-y-3">
+                                <!-- User prompt -->
+                                <div class="ai-prompt-bubble text-white text-xs">
+                                    <div class="text-white/60 text-[10px] mb-1 font-medium">You</div>
+                                    Build a neon button with hover glow effect
+                                </div>
+                                <!-- AI response -->
+                                <div class="ai-response-bubble text-xs">
+                                    <div
+                                        class="text-emerald-400 text-[10px] mb-1.5 font-medium flex items-center gap-1">
+                                        <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20">
+                                            <path
+                                                d="M10 2a1 1 0 011 1v1.323l3.954 1.582 1.599-.8a1 1 0 01.894 1.79l-1.233.616 1.738 5.42a1 1 0 01-.285 1.05A3.989 3.989 0 0114 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.715-5.349L10 6.477l-2.763 1.105 1.715 5.349a1 1 0 01-.285 1.05A3.989 3.989 0 016 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.738-5.42-1.233-.617a1 1 0 01.894-1.789l1.599.799L10 4.323V3a1 1 0 011-1z" />
+                                        </svg>
+                                        AI Generated
+                                    </div>
+                                    <div class="code-mockup-body !p-0 !min-h-0"
+                                        style="font-size: 0.68rem; line-height: 1.6;">
+                                        <span class="tag">.neon-btn</span> {<br>
+                                        &nbsp;&nbsp;<span class="prop">padding</span>: <span class="num">12px</span>
+                                        <span class="num">32px</span>;<br>
+                                        &nbsp;&nbsp;<span class="prop">background</span>: <span
+                                            class="kw">transparent</span>;<br>
+                                        &nbsp;&nbsp;<span class="prop">border</span>: <span class="num">2px</span> <span
+                                            class="kw">solid</span> <span class="str">#0ff</span>;<br>
+                                        &nbsp;&nbsp;<span class="prop">color</span>: <span class="str">#0ff</span>;<br>
+                                        &nbsp;&nbsp;<span class="prop">text-shadow</span>: <span class="num">0 0
+                                            8px</span> <span class="str">#0ff</span>;<br>
+                                        &nbsp;&nbsp;<span class="prop">transition</span>: <span class="kw">all</span>
+                                        <span class="num">0.3s</span>;<br>
+                                        }<br><br>
+                                        <span class="tag">.neon-btn</span><span class="fn">:hover</span> {<br>
+                                        &nbsp;&nbsp;<span class="prop">background</span>: <span
+                                            class="str">#0ff</span>;<br>
+                                        &nbsp;&nbsp;<span class="prop">color</span>: <span class="str">#000</span>;<br>
+                                        &nbsp;&nbsp;<span class="prop">box-shadow</span>: <span class="num">0 0
+                                            20px</span> <span class="str">#0ff</span>;<br>
+                                        }
+                                    </div>
+                                </div>
+                                <!-- Fake input -->
+                                <div class="flex gap-2 mt-1">
+                                    <div
+                                        class="flex-grow bg-slate-800/60 border border-slate-700/40 rounded-lg px-3 py-2 text-slate-500 text-xs">
+                                        Describe what to build...</div>
+                                    <div class="bg-purple-600 rounded-lg p-2 flex items-center justify-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-white"
+                                            viewBox="0 0 20 20" fill="currentColor">
+                                            <path
+                                                d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.428A1 1 0 009.894 15V4.106A1 1 0 0010.894 2.553z" />
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feature Cards Section -->
+            <div class="features-section">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-5xl mx-auto">
+                    <!-- Card 1: Real-time Collab -->
+                    <div class="feature-card">
+                        <div class="feature-icon bg-indigo-500/15">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-400" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-white font-bold text-base mb-2">Real-time Collab</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed">Code together in real-time with your team. See
+                            cursor positions, chat inline, and build features simultaneously.</p>
+                    </div>
+
+                    <!-- Card 2: AI Assistant -->
+                    <div class="feature-card">
+                        <div class="feature-icon bg-purple-500/15">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-400" viewBox="0 0 20 20"
+                                fill="currentColor">
+                                <path
+                                    d="M10 2a1 1 0 011 1v1.323l3.954 1.582 1.599-.8a1 1 0 01.894 1.79l-1.233.616 1.738 5.42a1 1 0 01-.285 1.05A3.989 3.989 0 0114 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.715-5.349L10 6.477l-2.763 1.105 1.715 5.349a1 1 0 01-.285 1.05A3.989 3.989 0 016 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.738-5.42-1.233-.617a1 1 0 01.894-1.789l1.599.799L10 4.323V3a1 1 0 011-1z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-white font-bold text-base mb-2">AI Code Assistant</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed">Describe what to build and let AI generate
+                            HTML, CSS & JS. Debug errors with console context for smarter fixes.</p>
+                    </div>
+
+                    <!-- Card 3: Live Preview -->
+                    <div class="feature-card">
+                        <div class="feature-icon bg-sky-500/15">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-sky-400" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-white font-bold text-base mb-2">Live Preview</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed">See your code come alive instantly. Download
+                            as ZIP, pop out to a new window, and share with one click.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Editor View -->
+        <div id="editor-view" class="hidden flex-grow flex flex-col h-screen">
+            <header class="header-glass px-4 py-2.5 flex items-center justify-between z-10 flex-shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-2">
+                        <div
+                            class="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                            </svg>
+                        </div>
+                        <h1
+                            class="text-base font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+                            Code Collab</h1>
+                    </div>
+                    <span
+                        class="font-mono text-xs px-2.5 py-1 rounded-md bg-slate-800/80 border border-slate-700/50 text-slate-400">Room:
+                        <span id="room-id-display" class="font-semibold text-indigo-300"></span></span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div id="participants-list" class="flex items-center gap-1.5 text-xs text-slate-300 mr-1"></div>
+                    <select id="theme-selector"
+                        class="bg-slate-800/80 border border-slate-700/50 text-slate-300 text-xs font-medium py-1.5 px-2 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer appearance-none"
+                        style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 20 20%22 fill=%22%2394a3b8%22><path fill-rule=%22evenodd%22 d=%22M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z%22 clip-rule=%22evenodd%22/></svg>'); background-repeat: no-repeat; background-position: right 6px center; background-size: 14px; padding-right: 24px;">
+                        <option value="material-darker">VS Code Dark</option>
+                        <option value="dracula">Dracula</option>
+                        <option value="monokai">Monokai</option>
+                        <option value="nord">Nord</option>
+                        <option value="ayu-dark">Ayu Dark</option>
+                        <option value="cobalt">Cobalt</option>
+                        <option value="twilight">Twilight</option>
+                        <option value="solarized dark">Solarized Dark</option>
+                    </select>
+                    <button id="toggle-ai-btn"
+                        class="flex items-center gap-1.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold py-1.5 px-3 rounded-lg transition-all duration-200 text-xs shadow-lg shadow-indigo-500/20">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20"
+                            fill="currentColor">
+                            <path
+                                d="M10 2a1 1 0 011 1v1.323l3.954 1.582 1.599-.8a1 1 0 01.894 1.79l-1.233.616 1.738 5.42a1 1 0 01-.285 1.05A3.989 3.989 0 0114 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.715-5.349L10 6.477l-2.763 1.105 1.715 5.349a1 1 0 01-.285 1.05A3.989 3.989 0 016 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.738-5.42-1.233-.617a1 1 0 01.894-1.789l1.599.799L10 4.323V3a1 1 0 011-1z" />
+                        </svg>
+                        AI
+                    </button>
+                    <button id="toggle-chat-btn"
+                        class="flex items-center gap-1.5 bg-slate-700/60 hover:bg-slate-600/60 border border-slate-600/30 text-white font-semibold py-1.5 px-3 rounded-lg transition-all duration-200 text-xs">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20"
+                            fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zM7 8H5v2h2V8zm2 0h2v2H9V8zm6 0h-2v2h2V8z"
+                                clip-rule="evenodd" />
+                        </svg>
+                        Chat
+                    </button>
+                    <button id="leave-room-btn"
+                        class="btn-danger text-white font-semibold py-1.5 px-3 rounded-lg text-xs">Leave</button>
+                </div>
+            </header>
+
+            <div id="content-wrapper" class="flex-grow flex flex-row gap-2 p-2 overflow-hidden">
+                <div id="editor-panel" class="flex flex-col gap-2" style="flex-basis: 50%;">
+                    <div class="flex flex-col bg-gray-800 rounded-lg overflow-hidden flex-1">
+                        <div class="bg-gray-900 px-4 py-2 text-sm font-semibold text-gray-300">HTML</div><textarea
+                            id="html-editor"></textarea>
+                    </div>
+                    <div class="flex flex-col bg-gray-800 rounded-lg overflow-hidden flex-1">
+                        <div class="bg-gray-900 px-4 py-2 text-sm font-semibold text-gray-300">CSS</div><textarea
+                            id="css-editor"></textarea>
+                    </div>
+                    <div class="flex flex-col bg-gray-800 rounded-lg overflow-hidden flex-1">
+                        <div class="bg-gray-900 px-4 py-2 text-sm font-semibold text-gray-300">JavaScript</div><textarea
+                            id="js-editor"></textarea>
+                    </div>
+                    <div class="flex flex-col bg-gray-800 rounded-lg overflow-hidden flex-1">
+                        <div
+                            class="bg-gray-900 px-4 py-2 text-sm font-semibold text-gray-300 flex justify-between items-center">
+                            <span>Console</span><button id="clear-console-btn"
+                                class="text-xs bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded">Clear</button>
+                        </div>
+                        <div id="console-output"
+                            class="p-2 overflow-y-auto text-sm font-mono space-y-1 w-full flex-grow"></div>
+                    </div>
+                </div>
+
+                <div id="resizer" class="resizer"></div>
+
+                <div id="output-panel" class="relative bg-white rounded-lg overflow-hidden" style="flex-basis: 50%;">
+                    <iframe id="output-frame" class="w-full h-full border-0"></iframe>
+                    <div class="absolute bottom-4 right-4 flex gap-2">
+                        <button id="download-btn" title="Download Code"
+                            class="bg-gray-700 text-white hover:bg-indigo-600 rounded-full p-3 shadow-lg transition-colors"><svg
+                                xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg></button>
+                        <button id="popout-btn" title="Open in New Window"
+                            class="bg-gray-700 text-white hover:bg-indigo-600 rounded-full p-3 shadow-lg transition-colors"><svg
+                                xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                            </svg></button>
+                    </div>
+                </div>
+
+                <!-- AI Prompt Panel -->
+                <div id="ai-panel" class="flex-col bg-gray-800 rounded-lg overflow-hidden transition-all duration-300"
+                    style="flex-basis: 0; display: none;">
+                    <div
+                        class="bg-gray-900 px-4 py-2 text-sm font-semibold text-purple-300 flex-shrink-0 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                            <path
+                                d="M10 2a1 1 0 011 1v1.323l3.954 1.582 1.599-.8a1 1 0 01.894 1.79l-1.233.616 1.738 5.42a1 1 0 01-.285 1.05A3.989 3.989 0 0114 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.715-5.349L10 6.477l-2.763 1.105 1.715 5.349a1 1 0 01-.285 1.05A3.989 3.989 0 016 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.738-5.42-1.233-.617a1 1 0 01.894-1.789l1.599.799L10 4.323V3a1 1 0 011-1z" />
+                        </svg>
+                        AI Assistant
+                    </div>
+                    <div id="ai-history" class="flex-grow p-3 overflow-y-auto space-y-2 text-sm"></div>
+                    <div id="ai-loading" class="hidden px-3 pb-2 flex items-center gap-2 text-gray-400 text-sm">
+                        <div class="ai-spinner"></div>
+                        <span id="ai-loading-text">AI is generating code...</span>
+                    </div>
+                    <form id="ai-form" class="p-2 border-t border-gray-700">
+                        <div class="flex gap-2">
+                            <input type="text" id="ai-input" placeholder="Describe what to build..."
+                                class="flex-grow bg-gray-700 border-gray-600 text-white px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+                            <button type="submit" id="ai-submit-btn"
+                                class="bg-purple-600 hover:bg-purple-700 text-white font-bold p-2 rounded-lg">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
+                                    fill="currentColor">
+                                    <path
+                                        d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.428A1 1 0 009.894 15V4.106A1 1 0 0010.894 2.553z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Chat Panel -->
+                <div id="chat-panel" class="flex-col bg-gray-800 rounded-lg overflow-hidden transition-all duration-300"
+                    style="flex-basis: 0; display: none;">
+                    <div class="bg-gray-900 px-4 py-2 text-sm font-semibold text-gray-300 flex-shrink-0">Room Chat</div>
+                    <div id="chat-messages" class="flex-grow p-4 overflow-y-auto space-y-4"></div>
+                    <form id="chat-form" class="p-2 border-t border-gray-700">
+                        <div class="flex gap-2"><input type="text" id="chat-input" placeholder="Type a message..."
+                                class="flex-grow bg-gray-700 border-gray-600 text-white px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"><button
+                                type="submit"
+                                class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold p-2 rounded-lg"><svg
+                                    xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
+                                    fill="currentColor">
+                                    <path
+                                        d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.428A1 1 0 009.894 15V4.106A1 1 0 0010.894 2.553z" />
+                                </svg></button></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div id="name-modal"
+            class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
+            <div class="glass-modal rounded-2xl p-8 w-full max-w-sm space-y-5 fade-in">
+                <div class="text-center space-y-1">
+                    <div
+                        class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 mb-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                    </div>
+                    <h2 id="modal-title" class="text-xl font-bold">Enter Your Name</h2>
+                </div>
+                <input type="text" id="name-input" placeholder="What should we call you?"
+                    class="input-premium w-full text-white px-4 py-3 rounded-xl text-sm placeholder-slate-500">
+                <div class="flex gap-3">
+                    <button id="modal-cancel"
+                        class="btn-secondary w-full text-white font-semibold py-2.5 px-4 rounded-xl text-sm">Cancel</button>
+                    <button id="modal-confirm"
+                        class="btn-primary w-full text-white font-semibold py-2.5 px-4 rounded-xl text-sm">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ─── Socket.IO Connection ─────────────────────────────────────────
+        const socket = io();
+
+        // ─── Generate a random UID (replaces Firebase anonymous auth) ─────
+        function generateUID() {
+            return 'u_' + Math.random().toString(36).substring(2, 11) + Date.now().toString(36);
+        }
+
+        // ─── DOM References ───────────────────────────────────────────────
+        const dom = {
+            home: document.getElementById('home-view'),
+            editor: document.getElementById('editor-view'),
+            createPrivateBtn: document.getElementById('create-private-room-btn'),
+            createPublicBtn: document.getElementById('create-public-room-btn'),
+            joinRandomBtn: document.getElementById('join-random-btn'),
+            joinBtn: document.getElementById('join-room-btn'),
+            roomIdInput: document.getElementById('room-id-input'),
+            roomIdDisplay: document.getElementById('room-id-display'),
+            participants: document.getElementById('participants-list'),
+            leaveBtn: document.getElementById('leave-room-btn'),
+            output: document.getElementById('output-frame'),
+            notification: document.getElementById('notification'),
+            console: document.getElementById('console-output'),
+            clearConsoleBtn: document.getElementById('clear-console-btn'),
+            modal: document.getElementById('name-modal'),
+            modalTitle: document.getElementById('modal-title'),
+            nameInput: document.getElementById('name-input'),
+            modalConfirm: document.getElementById('modal-confirm'),
+            modalCancel: document.getElementById('modal-cancel'),
+            chatPanel: document.getElementById('chat-panel'),
+            chatMessages: document.getElementById('chat-messages'),
+            chatForm: document.getElementById('chat-form'),
+            chatInput: document.getElementById('chat-input'),
+            toggleChatBtn: document.getElementById('toggle-chat-btn'),
+            aiPanel: document.getElementById('ai-panel'),
+            aiHistory: document.getElementById('ai-history'),
+            aiForm: document.getElementById('ai-form'),
+            aiInput: document.getElementById('ai-input'),
+            aiSubmitBtn: document.getElementById('ai-submit-btn'),
+            aiLoading: document.getElementById('ai-loading'),
+            aiLoadingText: document.getElementById('ai-loading-text'),
+            toggleAiBtn: document.getElementById('toggle-ai-btn'),
+            editorPanel: document.getElementById('editor-panel'),
+            outputPanel: document.getElementById('output-panel'),
+            resizer: document.getElementById('resizer'),
+            downloadBtn: document.getElementById('download-btn'),
+            popoutBtn: document.getElementById('popout-btn'),
+            contentWrapper: document.getElementById('content-wrapper')
+        };
+
+        let currentRoomId = null;
+        let localUser = null;
+        let debounceTimer = null;
+        let htmlEditor, cssEditor, jsEditor;
+        let isChatOpen = false;
+        let isAiOpen = false;
+        let isRemoteUpdate = false; // flag to prevent echo loops
+        let isAiGenerating = false;
+
+        // ─── Utility Functions ────────────────────────────────────────────
+        function showView(viewName) {
+            dom.home.style.display = viewName === 'home' ? 'flex' : 'none';
+            dom.editor.style.display = viewName === 'editor' ? 'flex' : 'none';
+        }
+
+        function showNotification(message, type = 'error') {
+            dom.notification.textContent = message;
+            const bgClass = { error: 'bg-red-500', info: 'bg-blue-500', success: 'bg-green-500' }[type] || 'bg-red-500';
+            dom.notification.className = `fixed top-5 right-5 text-white py-2 px-4 rounded-lg shadow-lg z-50 ${bgClass}`;
+            dom.notification.style.display = 'block';
+            setTimeout(() => { dom.notification.style.display = 'none'; }, 3000);
+        }
+
+        function askForName(title) {
+            return new Promise(resolve => {
+                dom.modalTitle.textContent = title;
+                dom.nameInput.value = '';
+                dom.modal.style.display = 'flex';
+
+                const onConfirm = () => {
+                    if (dom.nameInput.value.trim()) {
+                        cleanup();
+                        resolve(dom.nameInput.value.trim());
+                    }
+                };
+
+                const onCancel = () => {
+                    cleanup();
+                    resolve(null);
+                };
+
+                const onKeypress = e => {
+                    if (e.key === 'Enter') {
+                        onConfirm();
+                    }
+                };
+
+                const cleanup = () => {
+                    dom.modal.style.display = 'none';
+                    dom.modalConfirm.removeEventListener('click', onConfirm);
+                    dom.modalCancel.removeEventListener('click', onCancel);
+                    dom.nameInput.removeEventListener('keypress', onKeypress);
+                };
+
+                dom.modalConfirm.addEventListener('click', onConfirm);
+                dom.modalCancel.addEventListener('click', onCancel);
+                dom.nameInput.addEventListener('keypress', onKeypress);
+                dom.nameInput.focus();
+            });
+        }
+
+        function stringToColor(s) {
+            let h = 0;
+            if (!s) return '#ffffff';
+            for (let i = 0; i < s.length; i++) h = s.charCodeAt(i) + ((h << 5) - h);
+            let c = '#';
+            for (let i = 0; i < 3; i++) c += ('00' + ((h >> (i * 8)) & 0xFF).toString(16)).substr(-2);
+            return c;
+        }
+
+        // ─── Initialize App ──────────────────────────────────────────────
+        function initializeApp() {
+            const roomId = window.location.hash.substring(1);
+            if (roomId) {
+                handleJoinRoom(roomId);
+            } else {
+                showView('home');
+            }
+            window.addEventListener('hashchange', () => {
+                if (!window.location.hash.substring(1)) {
+                    leaveRoom();
+                }
+            });
+            initResizing();
+        }
+
+        // ─── Room Creation ────────────────────────────────────────────────
+        const handleCreateRoom = async (isPublic) => {
+            const name = await askForName(`Enter Your Name to Create ${isPublic ? 'Public' : 'Private'} Room`);
+            if (!name) return;
+
+            localUser = { uid: generateUID(), name };
+
+            try {
+                const res = await fetch('/api/rooms', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ isPublic })
+                });
+                const data = await res.json();
+
+                window.location.hash = data.roomId;
+                enterEditor(data.roomId);
+            } catch (e) {
+                console.error("Create room error:", e);
+                showNotification("Could not create room.");
+            }
+        };
+
+        dom.createPrivateBtn.addEventListener('click', () => handleCreateRoom(false));
+        dom.createPublicBtn.addEventListener('click', () => handleCreateRoom(true));
+
+        // ─── Join Random Public Room ──────────────────────────────────────
+        dom.joinRandomBtn.addEventListener('click', async () => {
+            showNotification("Finding a public room...", "info");
+
+            try {
+                const res = await fetch('/api/rooms/random/public');
+                if (res.ok) {
+                    const data = await res.json();
+                    handleJoinRoom(data.roomId);
+                } else {
+                    showNotification("No public rooms available. Why not create one?", "info");
+                }
+            } catch (error) {
+                console.error("Error finding random room:", error);
+                showNotification("Could not find a room. Please try again.");
+            }
+        });
+
+        // ─── Join Room by ID ──────────────────────────────────────────────
+        dom.joinBtn.addEventListener('click', () => {
+            const roomId = dom.roomIdInput.value.trim();
+            if (roomId) handleJoinRoom(roomId);
+            else showNotification("Please enter a Room ID.");
+        });
+
+        async function handleJoinRoom(roomId) {
+            try {
+                const res = await fetch(`/api/rooms/${roomId}`);
+                if (!res.ok) {
+                    showNotification("Room not found!");
+                    window.location.hash = '';
+                    return;
+                }
+                const name = await askForName('Enter Your Name to Join');
+                if (!name) {
+                    window.location.hash = '';
+                    return;
+                }
+                localUser = { uid: generateUID(), name };
+                window.location.hash = roomId;
+                enterEditor(roomId);
+            } catch (e) {
+                console.error("Join room error:", e);
+                showNotification("Could not join room.");
+                window.location.hash = '';
+            }
+        }
+
+        // ─── CodeMirror Editors ───────────────────────────────────────────
+        const savedTheme = localStorage.getItem('cc-editor-theme') || 'material-darker';
+
+        function initializeEditors() {
+            const opts = { theme: savedTheme, lineNumbers: true };
+            htmlEditor = CodeMirror.fromTextArea(document.getElementById('html-editor'), { ...opts, mode: 'xml', autoCloseTags: true });
+            cssEditor = CodeMirror.fromTextArea(document.getElementById('css-editor'), { ...opts, mode: 'css' });
+            jsEditor = CodeMirror.fromTextArea(document.getElementById('js-editor'), { ...opts, mode: 'javascript' });
+
+            // Set the dropdown to the saved theme
+            const selector = document.getElementById('theme-selector');
+            if (selector) selector.value = savedTheme;
+        }
+
+        function changeEditorTheme(theme) {
+            if (htmlEditor) htmlEditor.setOption('theme', theme);
+            if (cssEditor) cssEditor.setOption('theme', theme);
+            if (jsEditor) jsEditor.setOption('theme', theme);
+            localStorage.setItem('cc-editor-theme', theme);
+        }
+
+        document.getElementById('theme-selector').addEventListener('change', (e) => {
+            changeEditorTheme(e.target.value);
+        });
+
+        // ─── Enter Editor (replaces Firebase onSnapshot logic) ───────────
+        function enterEditor(roomId) {
+            currentRoomId = roomId;
+            showView('editor');
+            dom.roomIdDisplay.textContent = roomId;
+            if (!htmlEditor) initializeEditors();
+
+            // Tell the server we're joining this room
+            socket.emit('join-room', { roomId, user: localUser });
+
+            // Code change listeners (local edits → server)
+            htmlEditor.on('change', () => {
+                if (!isRemoteUpdate) handleCodeChange('html', htmlEditor.getValue());
+            });
+            cssEditor.on('change', () => {
+                if (!isRemoteUpdate) handleCodeChange('css', cssEditor.getValue());
+            });
+            jsEditor.on('change', () => {
+                if (!isRemoteUpdate) handleCodeChange('js', jsEditor.getValue());
+            });
+
+            // General event listeners
+            dom.chatForm.addEventListener('submit', handleSendMessage);
+            dom.aiForm.addEventListener('submit', handleAiSubmit);
+            dom.leaveBtn.addEventListener('click', leaveRoom);
+            dom.clearConsoleBtn.addEventListener('click', () => dom.console.innerHTML = '');
+            dom.toggleChatBtn.addEventListener('click', toggleChat);
+            dom.toggleAiBtn.addEventListener('click', toggleAi);
+            dom.downloadBtn.addEventListener('click', handleDownload);
+            dom.popoutBtn.addEventListener('click', handlePopout);
+
+            window.addEventListener('message', handleConsoleMessage);
+            window.addEventListener('beforeunload', handleBeforeUnload);
+        }
+
+        // ─── Socket.IO Listeners (replaces Firebase onSnapshot) ──────────
+
+        // Receive full room state when first joining
+        socket.on('room-state', (data) => {
+            isRemoteUpdate = true;
+            htmlEditor.setValue(data.html);
+            cssEditor.setValue(data.css);
+            jsEditor.setValue(data.js);
+            isRemoteUpdate = false;
+            updateIframe();
+            updateParticipants(data.participants);
+
+            // Render existing messages
+            dom.chatMessages.innerHTML = '';
+            data.messages.forEach(msg => renderMessage(msg));
+            dom.chatMessages.scrollTop = dom.chatMessages.scrollHeight;
+        });
+
+        // Receive real-time code updates from other users
+        socket.on('code-update', ({ lang, value }) => {
+            isRemoteUpdate = true;
+            const editor = lang === 'html' ? htmlEditor : lang === 'css' ? cssEditor : jsEditor;
+            const cursor = editor.getCursor();
+            const scrollInfo = editor.getScrollInfo();
+            editor.setValue(value);
+            editor.setCursor(cursor);
+            editor.scrollTo(scrollInfo.left, scrollInfo.top);
+            isRemoteUpdate = false;
+            updateIframe();
+        });
+
+        // Receive participant updates
+        socket.on('participants-update', (participants) => {
+            updateParticipants(participants);
+        });
+
+        // Receive new chat messages
+        socket.on('new-message', (message) => {
+            renderMessage(message);
+            dom.chatMessages.scrollTop = dom.chatMessages.scrollHeight;
+        });
+
+        // Handle server errors
+        socket.on('error-msg', (msg) => {
+            showNotification(msg);
+        });
+
+        // ─── AI Socket.IO Listeners ───────────────────────────────────────
+        socket.on('ai-status', ({ status, prompt, user }) => {
+            if (status === 'generating') {
+                dom.aiLoading.classList.remove('hidden');
+                dom.aiLoadingText.textContent = `${user} asked AI to generate...`;
+                dom.aiSubmitBtn.disabled = true;
+                isAiGenerating = true;
+            } else if (status === 'error') {
+                dom.aiLoading.classList.add('hidden');
+                dom.aiSubmitBtn.disabled = false;
+                isAiGenerating = false;
+            }
+        });
+
+        socket.on('ai-result', ({ html, css, js, prompt, user }) => {
+            dom.aiLoading.classList.add('hidden');
+            dom.aiSubmitBtn.disabled = false;
+            isAiGenerating = false;
+
+            // Add to AI history
+            const promptDiv = document.createElement('div');
+            promptDiv.className = 'ai-prompt-bubble text-white text-xs';
+            promptDiv.innerHTML = `<span class="font-bold">${user}:</span> ${escapeHtml(prompt)}`;
+            dom.aiHistory.appendChild(promptDiv);
+
+            const responseDiv = document.createElement('div');
+            responseDiv.className = 'ai-response-bubble text-gray-200 text-xs';
+            responseDiv.textContent = '✅ Code generated and inserted into editors';
+            dom.aiHistory.appendChild(responseDiv);
+            dom.aiHistory.scrollTop = dom.aiHistory.scrollHeight;
+
+            // Insert code into editors
+            isRemoteUpdate = true;
+            htmlEditor.setValue(html);
+            cssEditor.setValue(css);
+            jsEditor.setValue(js);
+            isRemoteUpdate = false;
+            updateIframe();
+
+            showNotification('AI code generated!', 'success');
+        });
+
+        socket.on('ai-error', (msg) => {
+            dom.aiLoading.classList.add('hidden');
+            dom.aiSubmitBtn.disabled = false;
+            isAiGenerating = false;
+            showNotification(msg);
+
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'ai-response-bubble text-red-400 text-xs';
+            errorDiv.textContent = '❌ ' + msg;
+            dom.aiHistory.appendChild(errorDiv);
+        });
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ─── Code Change Handler (debounced, sends to server) ─────────────
+        function handleCodeChange(lang, value) {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                if (currentRoomId) {
+                    socket.emit('code-change', { roomId: currentRoomId, lang, value });
+                }
+                updateIframe();
+            }, 300);
+        }
+
+        // ─── Chat ─────────────────────────────────────────────────────────
+        const handleSendMessage = async (e) => {
+            e.preventDefault();
+            const text = dom.chatInput.value.trim();
+            if (!text || !currentRoomId) return;
+
+            socket.emit('send-message', { roomId: currentRoomId, text });
+            dom.chatInput.value = '';
+        };
+
+        function renderMessage(data) {
+            const isMe = data.senderUid === localUser.uid;
+            const msgContainer = document.createElement('div');
+            msgContainer.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'}`;
+            const bubble = document.createElement('div');
+            bubble.className = `px-3 py-2 rounded-lg max-w-xs ${isMe ? 'bg-indigo-600' : 'bg-gray-600'}`;
+            if (!isMe) {
+                const sender = document.createElement('div');
+                sender.className = 'text-xs font-bold text-indigo-300';
+                sender.textContent = data.senderName;
+                bubble.appendChild(sender);
+            }
+            const msgText = document.createElement('p');
+            msgText.className = 'text-sm break-words';
+            msgText.textContent = data.text;
+            bubble.appendChild(msgText);
+            msgContainer.appendChild(bubble);
+            dom.chatMessages.appendChild(msgContainer);
+        }
+
+        // ─── iframe Preview ───────────────────────────────────────────────
+        function updateIframe() {
+            if (!htmlEditor || !cssEditor || !jsEditor) return;
+            const consoleScript = `<script>const f=a=>{if(a instanceof Error)return a.stack||a.message;if(typeof a==='object'&&a!==null)try{return JSON.stringify(a)}catch(e){return'[Unserializable]'}return String(a)};const o=(m,t)=>{const c=console[m];console[m]=(...a)=>{window.parent.postMessage({s:'iframe-console',t,m:a.map(f).join(' ')},'*');c.apply(console,a)}};['log','error','warn','info'].forEach(m=>o(m,m));window.addEventListener('error',e=>window.parent.postMessage({s:'iframe-console',t:'error',m:e.message},'*'));<\/script>`;
+            const content = `<html><head><style>${cssEditor.getValue()}<\/style>${consoleScript}<\/head><body>${htmlEditor.getValue()}<script>try{${jsEditor.getValue()}}catch(e){console.error(e);}<\/script><\/body><\/html>`;
+            dom.output.srcdoc = content;
+        }
+
+        function handleConsoleMessage({ source, data }) {
+            if (source !== dom.output.contentWindow || data.s !== 'iframe-console') return;
+            const logEntry = document.createElement('div');
+            logEntry.textContent = data.m;
+            logEntry.className = `console-${data.t}`;
+            logEntry.innerHTML = `<span class="text-gray-500 mr-2">&gt;</span>` + logEntry.innerHTML;
+            dom.console.appendChild(logEntry);
+            dom.console.scrollTop = dom.console.scrollHeight;
+
+            // Send console output to server so AI can see it
+            if (currentRoomId) {
+                socket.emit('console-log', { roomId: currentRoomId, type: data.t, message: data.m });
+            }
+        }
+
+        // ─── Participants Display ─────────────────────────────────────────
+        function updateParticipants(participants) {
+            dom.participants.innerHTML = '';
+            participants.forEach(p => {
+                const pEl = document.createElement('div');
+                pEl.className = 'flex items-center gap-2 bg-gray-700 px-3 py-1 rounded-full';
+                const avatar = document.createElement('div');
+                avatar.className = 'w-5 h-5 rounded-full';
+                avatar.style.backgroundColor = stringToColor(p.uid);
+                pEl.append(avatar, p.name);
+                dom.participants.appendChild(pEl);
+            });
+        }
+
+        // ─── AI Prompt Submit ─────────────────────────────────────────────
+        function handleAiSubmit(e) {
+            e.preventDefault();
+            const prompt = dom.aiInput.value.trim();
+            if (!prompt || !currentRoomId || isAiGenerating) return;
+
+            socket.emit('ai-generate', { roomId: currentRoomId, prompt });
+            dom.aiInput.value = '';
+        }
+
+        // ─── Panel Toggles ────────────────────────────────────────────────
+        function toggleAi() {
+            isAiOpen = !isAiOpen;
+            if (isAiOpen) {
+                // Close chat if open
+                if (isChatOpen) {
+                    isChatOpen = false;
+                    dom.chatPanel.style.display = 'none';
+                    dom.chatPanel.style.flexBasis = '0px';
+                }
+                dom.aiPanel.style.display = 'flex';
+                dom.aiPanel.style.flexBasis = '320px';
+                dom.resizer.style.display = 'none';
+                dom.editorPanel.style.flexBasis = '50%';
+                dom.outputPanel.style.flexBasis = '50%';
+            } else {
+                dom.aiPanel.style.display = 'none';
+                dom.aiPanel.style.flexBasis = '0px';
+                dom.resizer.style.display = 'block';
+            }
+            refreshEditors();
+        }
+
+        function toggleChat() {
+            isChatOpen = !isChatOpen;
+            if (isChatOpen) {
+                // Close AI if open
+                if (isAiOpen) {
+                    isAiOpen = false;
+                    dom.aiPanel.style.display = 'none';
+                    dom.aiPanel.style.flexBasis = '0px';
+                }
+                dom.chatPanel.style.display = 'flex';
+                dom.chatPanel.style.flexBasis = '300px';
+                dom.resizer.style.display = 'none';
+                dom.editorPanel.style.flexBasis = '50%';
+                dom.outputPanel.style.flexBasis = '50%';
+            } else {
+                dom.chatPanel.style.display = 'none';
+                dom.chatPanel.style.flexBasis = '0px';
+                dom.resizer.style.display = 'block';
+            }
+            refreshEditors();
+        }
+
+        // ─── Panel Resizing ──────────────────────────────────────────────
+        function initResizing() {
+            let isResizing = false;
+            dom.resizer.addEventListener('mousedown', (e) => {
+                isResizing = true;
+                document.body.style.cursor = 'col-resize';
+            });
+            document.addEventListener('mousemove', (e) => {
+                if (!isResizing || isChatOpen) return;
+                const wrapper = dom.contentWrapper.getBoundingClientRect();
+                const editorWidth = e.clientX - wrapper.left;
+                const outputWidth = wrapper.width - editorWidth - dom.resizer.offsetWidth;
+                if (editorWidth > 200 && outputWidth > 200) {
+                    dom.editorPanel.style.flexBasis = `${editorWidth}px`;
+                    dom.outputPanel.style.flexBasis = `${outputWidth}px`;
+                }
+            });
+            document.addEventListener('mouseup', () => {
+                isResizing = false;
+                document.body.style.cursor = 'default';
+                refreshEditors();
+            });
+        }
+
+        // ─── Download as ZIP ─────────────────────────────────────────────
+        async function handleDownload() {
+            const zip = new JSZip();
+            const htmlContent = `<!DOCTYPE html>\n<html>\n<head>\n  <link rel="stylesheet" href="style.css">\n</head>\n<body>\n${htmlEditor.getValue()}\n  <script src="script.js"><\/script>\n</body>\n</html>`;
+            zip.file("index.html", htmlContent);
+            zip.file("style.css", cssEditor.getValue());
+            zip.file("script.js", jsEditor.getValue());
+            const content = await zip.generateAsync({ type: "blob" });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(content);
+            link.download = "code-collab-project.zip";
+            link.click();
+            URL.revokeObjectURL(link.href);
+        }
+
+        // ─── Popout Preview ──────────────────────────────────────────────
+        function handlePopout() {
+            const content = `<html><head><title>Output</title><style>${cssEditor.getValue()}<\/style></head><body>${htmlEditor.getValue()}<script>${jsEditor.getValue()}<\/script></body></html>`;
+            const blob = new Blob([content], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            window.open(url, '_blank');
+        }
+
+        function refreshEditors() {
+            setTimeout(() => {
+                if (htmlEditor) htmlEditor.refresh();
+                if (cssEditor) cssEditor.refresh();
+                if (jsEditor) jsEditor.refresh();
+            }, 10);
+        }
+
+        // ─── Leave Room ──────────────────────────────────────────────────
+        function leaveRoom() {
+            if (currentRoomId) {
+                socket.emit('leave-room');
+            }
+
+            currentRoomId = null;
+            localUser = null;
+            window.location.hash = '';
+
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+            window.removeEventListener('message', handleConsoleMessage);
+
+            showView('home');
+        }
+
+        function handleBeforeUnload() {
+            if (currentRoomId) {
+                socket.emit('leave-room');
+            }
+        }
+
+        // ─── Start the App ───────────────────────────────────────────────
+        initializeApp();
+    </script>
+</body>
+
+</html>
