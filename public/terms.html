@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms of Service - Code Collab</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'], } } } }
+    </script>
+</head>
+
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
+
+    <!-- Simple Navbar -->
+    <nav class="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
+        <a href="/" class="flex items-center gap-2">
+            <img src="/codelogo.png" alt="Code Collab Logo" class="w-8 h-8 rounded-lg shadow-sm" />
+            <span class="font-extrabold text-xl text-slate-900 tracking-tight">Code Collab</span>
+        </a>
+        <a href="/" class="text-sm font-semibold text-slate-600 hover:text-orange-500 transition-colors">Back to
+            Home</a>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-3xl mx-auto w-full px-6 py-16">
+        <h1 class="text-4xl font-extrabold text-slate-900 mb-8">Terms of Service</h1>
+
+        <div class="prose prose-slate prose-orange max-w-none space-y-6 text-slate-600">
+            <p>Last updated: March 2026</p>
+
+            <h2 class="text-2xl font-bold text-slate-900 mt-8 mb-4">1. Acceptance of Terms</h2>
+            <p>By accessing or using Code Collab, you agree to comply with and be bound by these Terms of Service. If
+                you do not agree, please do not use the application.</p>
+
+            <h2 class="text-2xl font-bold text-slate-900 mt-8 mb-4">2. Description of Service</h2>
+            <p>Code Collab provides a web-based, real-time collaborative coding environment for HTML, CSS, and
+                JavaScript. We also offer an integrated AI assistant powered by Hugging Face models.</p>
+
+            <h2 class="text-2xl font-bold text-slate-900 mt-8 mb-4">3. User Conduct</h2>
+            <p>You agree not to use the service for any unlawful purposes or to conduct any activity that would
+                constitute a civil or criminal offense. You are solely responsible for all content, code, and chat
+                messages you transmit or share within a collaborative room.</p>
+            <ul class="list-disc pl-5 mt-2 space-y-1">
+                <li>Do not share malicious code or malware.</li>
+                <li>Do not harass, abuse, or harm other users.</li>
+                <li>Do not use the AI generation features to generate harmful, illegal, or abusive content.</li>
+            </ul>
+
+            <h2 class="text-2xl font-bold text-slate-900 mt-8 mb-4">4. "As Is" Service</h2>
+            <p>Code Collab is provided on an "AS IS" and "AS AVAILABLE" basis. We offer no warranties that the service
+                will be uninterrupted, secure, or error-free. We are not responsible for lost code. Please use the
+                "Download as ZIP" function frequently to backup your work locally.</p>
+
+            <h2 class="text-2xl font-bold text-slate-900 mt-8 mb-4">5. Limitation of Liability</h2>
+            <p>In no event shall Code Collab, its creators, or contributors be liable for any indirect, incidental,
+                special, consequential, or punitive damages resulting from your access to or use of the service.</p>
+
+            <p class="mt-8 pt-8 border-t border-slate-200">If you find a bug or have questions, please reach out via our
+                GitHub repository.</p>
+        </div>
+    </main>
+
+    <!-- Simple Footer -->
+    <footer class="bg-slate-950 py-8 text-center border-t border-slate-800">
+        <p class="text-slate-500 text-sm">© 2026 Code Collab. All rights reserved.</p>
+    </footer>
+
+</body>
+
+</html>

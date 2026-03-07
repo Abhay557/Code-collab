@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cookie Policy - Code Collab</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'], } } } }
+    </script>
+</head>
+
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
+
+    <!-- Simple Navbar -->
+    <nav class="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
+        <a href="/" class="flex items-center gap-2">
+            <img src="/codelogo.png" alt="Code Collab Logo" class="w-8 h-8 rounded-lg shadow-sm" />
+            <span class="font-extrabold text-xl text-slate-900 tracking-tight">Code Collab</span>
+        </a>
+        <a href="/" class="text-sm font-semibold text-slate-600 hover:text-orange-500 transition-colors">Back to
+            Home</a>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-3xl mx-auto w-full px-6 py-16">
+        <h1 class="text-4xl font-extrabold text-slate-900 mb-8">Cookie Policy</h1>
+
+        <div class="prose prose-slate prose-orange max-w-none space-y-6 text-slate-600">
+            <p>Last updated: March 2026</p>
+
+            <h2 class="text-2xl font-bold text-slate-900 mt-8 mb-4">1. What are Cookies?</h2>
+            <p>Cookies are small text files that are placed on your computer or mobile device when you visit a website.
+                They are widely used to make websites work, improve performance, or provide information to the owners of
+                the site.</p>
+
+            <h2 class="text-2xl font-bold text-slate-900 mt-8 mb-4">2. How We Use Cookies (And LocalStorage)</h2>
+            <p>Code Collab focuses on being a lightweight, fast, and privacy-respecting application. <strong>We do not
+                    use tracking cookies, advertising cookies, or third-party analytics cookies.</strong></p>
+            <p>We primarily use the browser's <code>localStorage</code> API as a modern alternative to traditional
+                cookies to provide a seamless user experience. Specifically, we use it for:</p>
+            <ul class="list-disc pl-5 mt-2 space-y-1">
+                <li><strong>Editor Preferences:</strong> Saving your selected theme (e.g., "material-darker" vs
+                    "dracula") so that your editor looks the way you prefer the next time you visit.</li>
+            </ul>
+
+            <h2 class="text-2xl font-bold text-slate-900 mt-8 mb-4">3. Managing Your Preferences</h2>
+            <p>Because we only use local storage for essential usability features (like remembering your theme), there
+                is no complex cookie banner to accept or decline. If you wish to clear this data, you can do so at any
+                time using your web browser's built-in tools to clear cache, cookies, and site data.</p>
+        </div>
+    </main>
+
+    <!-- Simple Footer -->
+    <footer class="bg-slate-950 py-8 text-center border-t border-slate-800">
+        <p class="text-slate-500 text-sm">© 2026 Code Collab. All rights reserved.</p>
+    </footer>
+
+</body>
+
+</html>
