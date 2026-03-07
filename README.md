@@ -57,15 +57,16 @@ Designed for speed and simplicity, Code Collab requires no sign-ups or installat
    ```env
    HF_TOKEN=your_hugging_face_access_token_here
    ```
-
-4. **Start the Development Server**
+   this step is not needed make and connect your backend from
+   ```https://huggingface.co/spaces/Abhay557/code-collab/```
+5. **Start the Development Server**
    ```bash
    npm run dev
    # or
    npm start
    ```
 
-5. **Open the App**
+6. **Open the App**
    Navigate to `http://localhost:3000` in your web browser.
 
 ---
