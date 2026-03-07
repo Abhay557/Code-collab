@@ -4,21 +4,24 @@ Code Collab is a fast, frictionless, real-time collaborative web IDE. It allows 
 
 Designed for speed and simplicity, Code Collab requires no sign-ups or installations. It also features a built-in AI Assistant powered by Hugging Face to help you generate, debug, and refactor code on the fly.
 
----
+![Preview](preview.png)
 
-## ✨ Features
-
-- **⚡ Real-time Collaboration:** Code together in absolute real-time without latency. Cursors and edits sync instantly across all clients in a room.
-- **🤖 Built-in AI Assistant:** A floating AI panel powered by Hugging Face (`Qwen2.5-Coder`). Describe what you want to build, and the AI will generate the HTML, CSS, and JS, injecting it directly into your editors.
-- **👀 Live Preview & Console:** Instantly view the results of your code in a sandboxed iframe. A built-in console helps you catch and debug JavaScript errors.
-- **🚫 Zero Friction:** No accounts, no passwords, no setup. Click "Create Room," share the URL, and start coding within seconds.
-- **💾 Export Project:** One-click download of your entire workspace as a zipped `.zip` file, ready to be dropped into VS Code or deployed.
-- **🎨 Premium UI:** A beautiful, responsive, and modern interface built with Tailwind CSS, featuring custom CodeMirror themes and warm orange/amber aesthetics.
-- **💬 Room Chat:** Communicate with your team in real-time via the built-in room chat panel.
 
 ---
 
-## 🛠️ Tech Stack
+##  Features
+
+- **Real-time Collaboration:** Code together in absolute real-time without latency. Cursors and edits sync instantly across all clients in a room.
+- **Built-in AI Assistant:** A floating AI panel powered by Hugging Face (`Qwen2.5-Coder`). Describe what you want to build, and the AI will generate the HTML, CSS, and JS, injecting it directly into your editors.
+- **Live Preview & Console:** Instantly view the results of your code in a sandboxed iframe. A built-in console helps you catch and debug JavaScript errors.
+- **Zero Friction:** No accounts, no passwords, no setup. Click "Create Room," share the URL, and start coding within seconds.
+- **Export Project:** One-click download of your entire workspace as a zipped `.zip` file, ready to be dropped into VS Code or deployed.
+- **Premium UI:** A beautiful, responsive, and modern interface built with Tailwind CSS, featuring custom CodeMirror themes and warm orange/amber aesthetics.
+- **Room Chat:** Communicate with your team in real-time via the built-in room chat panel.
+
+---
+
+##  Tech Stack
 
 - **Frontend:**
   - Vanilla HTML, CSS, JavaScript
@@ -32,7 +35,7 @@ Designed for speed and simplicity, Code Collab requires no sign-ups or installat
 
 ---
 
-## 🚀 Getting Started
+##  Getting Started
 
 ### Prerequisites
 
@@ -57,20 +60,21 @@ Designed for speed and simplicity, Code Collab requires no sign-ups or installat
    ```env
    HF_TOKEN=your_hugging_face_access_token_here
    ```
-
-4. **Start the Development Server**
+   this step is not needed make and connect your backend from
+   ```https://huggingface.co/spaces/Abhay557/code-collab/```
+5. **Start the Development Server**
    ```bash
    npm run dev
    # or
    npm start
    ```
 
-5. **Open the App**
+6. **Open the App**
    Navigate to `http://localhost:3000` in your web browser.
 
 ---
 
-## 📖 How to Use
+##  How to Use
 
 1. **Create a Room**: On the home page, click "Start Coding" or "Create Public/Private Room".
 2. **Share the Link**: Copy the URL from your browser's address bar and send it to a friend.
@@ -80,7 +84,7 @@ Designed for speed and simplicity, Code Collab requires no sign-ups or installat
 
 ---
 
-## 🤝 Contributing
+##  Contributing
 
 Contributions are welcome! If you find a bug or have a feature request, please open an issue. If you want to contribute code, feel free to submit a Pull Request.
 
@@ -92,10 +96,15 @@ Contributions are welcome! If you find a bug or have a feature request, please o
 
 ---
 
-## 📄 License
+##  License
 
 This project is open-source and available under the standard MIT License.
 
 ---
 
 *Built with passion by developers, for developers.*
+
+## Acknowledgements
+This project is a new and expanded version of my original collaborative editor, Codependal. It builds upon the core ideas of simplicity and real-time collaboration that I explored in that initial project.
+
+[Codependal Repository](https://github.com/Abhay557/Codependal)
