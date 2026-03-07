@@ -117,13 +117,18 @@ const cleanBlock = (code) => {
 
 const cleanCode = (code, type) => {
     if (!code) return null;
+    let cleaned = code.trim();
     if (type === 'html') {
-        code = code.replace(/<body[^>]*>/gi, '').replace(/<\/body>/gi, '');
-        code = code.replace(/<html[^>]*>/gi, '').replace(/<\/html>/gi, '');
-        code = code.replace(/<head[^>]*>/gi, '').replace(/<\/head>/gi, '');
-        code = code.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
+        // Aggressively remove all structural boilerplate Tags including any with attributes
+        cleaned = cleaned.replace(/<body[^>]*>/gi, '').replace(/<\/body>/gi, '');
+        cleaned = cleaned.replace(/<html[^>]*>/gi, '').replace(/<\/html>/gi, '');
+        cleaned = cleaned.replace(/<head[^>]*>/gi, '').replace(/<\/head>/gi, '');
+        cleaned = cleaned.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
+        cleaned = cleaned.replace(/<script(?![^>]*src=)[^>]*>[\s\S]*?<\/script>/gi, '');
+        // Also remove any dangling / closing tags that might have survived
+        cleaned = cleaned.replace(/<\/?style[^>]*>/gi, '').replace(/<\/?script[^>]*>/gi, '');
     }
-    const lines = code.split('\n');
+    const lines = cleaned.split('\n');
     let startIndex = 0;
     while (startIndex < lines.length) {
         const line = lines[startIndex].trim();
@@ -131,8 +136,9 @@ const cleanCode = (code, type) => {
             startIndex++;
             continue;
         }
+        // Filter out typical AI chatty lines and hallucinated instructions
         if (line.startsWith('(') || line.startsWith('Note:') || line.match(/^Here is/i) || line.match(/^Sure,/i) ||
-            line.match(/body content only/i) || line.match(/no html\/head\/body tags/i)) {
+            line.match(/body content only/i) || line.match(/no html\/head\/body tags/i) || line.match(/code for window popup/i)) {
             startIndex++;
         } else {
             break;
@@ -318,12 +324,13 @@ ${consoleSection}
 User's request: "${prompt}"
 
 Please generate the complete updated code based on the user's request. 
-IMPORTANT: 
-1. Do NOT include <html>, <head>, or <body> tags in your HTML output. 
-2. Only provide the content that goes INSIDE the <body> tag.
-3. If the user is asking to fix or debug their code, analyze the existing code and console output.
-4. Always respond with separate \`\`\`html, \`\`\`css, and \`\`\`js code blocks.
-5. If a block (HTML, CSS, or JS) remains unchanged, you may omit it or provide it as-is.`;
+CRITICAL RULES: 
+1. DO NOT include <html>, <head>, or <body> or <title> tags. 
+2. EXCLUDE all <style> and <script> tags from your HTML block. 
+3. Put ALL CSS in the \`\`\`css block and ALL JavaScript in the \`\`\`js block. 
+4. The HTML block should contain ONLY the elements that live inside a <body> (e.g. <div>, <button>, etc.).
+5. If a block is unchanged, omit it or provide it as-is.
+6. DO NOT add any conversational text before or after the code blocks.`;
 
         try {
             const response = await fetch(`${AI_BACKEND}/generate`, {
