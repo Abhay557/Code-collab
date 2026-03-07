@@ -93,24 +93,63 @@ app.get('/api/rooms/:id', (req, res) => {
     }
 });
 
-// ─── AI Response Parser ───────────────────────────────────────────────
+// ─── AI Code Cleanup Helpers ──────────────────────────────────────────
+
+const cleanBlock = (code) => {
+    if (!code) return null;
+    let c = code.trim();
+    const prefixesToRemove = [
+        '(body content only, no html/head/body tags)',
+        '<body content only, no html/head/body tags>',
+        '(complete styles)',
+        '<complete styles>',
+        '(complete JavaScript)',
+        '<complete JavaScript>',
+        '(JavaScript code)'
+    ];
+    for (const prefix of prefixesToRemove) {
+        if (c.startsWith(prefix)) {
+            c = c.substring(prefix.length).trim();
+        }
+    }
+    return c || null;
+};
+
+const cleanCode = (code, type) => {
+    if (!code) return null;
+    if (type === 'html') {
+        code = code.replace(/<body[^>]*>/gi, '').replace(/<\/body>/gi, '');
+        code = code.replace(/<html[^>]*>/gi, '').replace(/<\/html>/gi, '');
+        code = code.replace(/<head[^>]*>/gi, '').replace(/<\/head>/gi, '');
+        code = code.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
+    }
+    const lines = code.split('\n');
+    let startIndex = 0;
+    while (startIndex < lines.length) {
+        const line = lines[startIndex].trim();
+        if (!line) {
+            startIndex++;
+            continue;
+        }
+        if (line.startsWith('(') || line.startsWith('Note:') || line.match(/^Here is/i) || line.match(/^Sure,/i) ||
+            line.match(/body content only/i) || line.match(/no html\/head\/body tags/i)) {
+            startIndex++;
+        } else {
+            break;
+        }
+    }
+    return lines.slice(startIndex).join('\n').trim();
+};
+
 // ─── AI Response Parser ───────────────────────────────────────────────
 
 function parseCodeBlocks(text) {
     console.log('--- RAW AI RESPONSE ---');
     console.log(text);
     console.log('-----------------------');
-
-    // Write to debug file
-    try {
-        fs.writeFileSync('debug_ai_response.txt', text);
-    } catch (e) {
-        console.error('Failed to write debug file:', e);
-    }
+    try { fs.writeFileSync('debug_ai_response.txt', text); } catch (e) { }
 
     const result = { html: null, css: null, js: null };
-
-    // 1. Try matching fenced code blocks: ```lang\n...code...\n```
     const blockRegex = /```(\w*)\s*\n([\s\S]*?)```/g;
     let match;
     let foundFences = false;
@@ -119,144 +158,43 @@ function parseCodeBlocks(text) {
         foundFences = true;
         let lang = match[1].toLowerCase().trim();
         const code = match[2].trim();
-
-        if (lang === 'html' || lang === 'xml') {
-            result.html = code;
-        } else if (lang === 'css') {
-            result.css = code;
-        } else if (lang === 'js' || lang === 'javascript') {
-            result.js = code;
-        } else if (lang === '') {
+        if (lang === 'html' || lang === 'xml') result.html = code;
+        else if (lang === 'css') result.css = code;
+        else if (lang === 'js' || lang === 'javascript') result.js = code;
+        else if (lang === '') {
             if (code.trim().startsWith('<')) result.html = code;
             else if (code.includes('{') && code.includes(':')) result.css = code;
             else result.js = code;
         }
     }
 
-    // 2. Fallback: If no fences, try extraction from raw text
     if (!foundFences) {
-        console.log('No code fences found. Attempting extraction...');
         let remainingText = text;
-
-        // Extract CSS from <style>...</style> (Case-insensitive, multiline)
-        const styleMatch = remainingText.match(/<style[^>]*>([\s\S]*?)<\/style>/i);
-        if (styleMatch) {
-            result.css = styleMatch[1].trim();
-            // Remove the style block from text so it doesn't get grabbed by HTML parser
-            remainingText = remainingText.replace(/<style[^>]*>[\s\S]*?<\/style>/i, '');
-        }
-
-        // Extract JS from <script>...</script> (ignoring scripts with src)
         const scriptMatch = remainingText.match(/<script(?![^>]*src=)[^>]*>([\s\S]*?)<\/script>/i);
         if (scriptMatch) {
             result.js = scriptMatch[1].trim();
             remainingText = remainingText.replace(/<script(?![^>]*src=)[^>]*>[\s\S]*?<\/script>/i, '');
         }
-
-        // 3. Try Section Headers on remaining text (e.g. "HTML:", "**CSS**")
-        if (result.html === null) {
-            const htmlMatch = remainingText.match(/(?:^|\n)(?:\*\*|#+\s*)?HTML(?:\*\*|:)?(?:\s*\n|\s+)([\s\S]*?)(?=(?:^|\n)(?:\*\*|#+\s*)?(?:CSS|JS|JAVASCRIPT)|$)/i);
-            if (htmlMatch) {
-                result.html = htmlMatch[1].trim();
-            }
-        }
     }
 
-    // 4. Final Fallback: Treat entire text as HTML
-    if (result.html === null && result.css === null && result.js === null) {
-        const trimmed = text.trim();
-        if (trimmed.startsWith('<')) result.html = trimmed;
-    }
-
-    // 5. Post-Processing: Extract embedded <style> and <script> from result.html
+    // Extraction of embedded style/script from HTML block
     if (result.html) {
-        // Log to file for debugging
-        try {
-            fs.appendFileSync('debug_extraction.log', `\n--- NEW POST-PROCESSING ---\nHTML Length: ${result.html.length}\n`);
-        } catch (e) { }
-
-        // Extract ALL CSS
         while (true) {
-            // Lenient regex: allows missing </style> if followed by </head>, </body>, </html>, or End of String
             const styleMatch = result.html.match(/<style[^>]*>([\s\S]*?)(?:<\/style>|(?=<\/head>|<\/body>|<\/html>|$))/i);
             if (!styleMatch) break;
-
-            try { fs.appendFileSync('debug_extraction.log', `Found style at index ${styleMatch.index}\n`); } catch (e) { }
-
             const cssContent = styleMatch[1].trim();
-            if (cssContent) {
-                result.css = (result.css ? result.css + '\n\n' : '') + cssContent;
-            }
-            // Safe removal using substring (avoids regex replacement issues)
-            const before = result.html.substring(0, styleMatch.index);
-            const after = result.html.substring(styleMatch.index + styleMatch[0].length);
-            result.html = (before + after).trim();
+            if (cssContent) result.css = (result.css ? result.css + '\n\n' : '') + cssContent;
+            result.html = (result.html.substring(0, styleMatch.index) + result.html.substring(styleMatch.index + styleMatch[0].length)).trim();
         }
-
-        // Extract ALL JS
         while (true) {
-            // Lenient regex: allows missing </script> if followed by </body>, </html>, or End of String
             const scriptMatch = result.html.match(/<script(?![^>]*src=)[^>]*>([\s\S]*?)(?:<\/script>|(?=<\/body>|<\/html>|$))/i);
             if (!scriptMatch) break;
-
-            try { fs.appendFileSync('debug_extraction.log', `Found script at index ${scriptMatch.index}\n`); } catch (e) { }
-
             const jsContent = scriptMatch[1].trim();
-            if (jsContent) {
-                result.js = (result.js ? result.js + '\n\n' : '') + jsContent;
-            }
-            // Safe removal using substring
-            const before = result.html.substring(0, scriptMatch.index);
-            const after = result.html.substring(scriptMatch.index + scriptMatch[0].length);
-            result.html = (before + after).trim();
+            if (jsContent) result.js = (result.js ? result.js + '\n\n' : '') + jsContent;
+            result.html = (result.html.substring(0, scriptMatch.index) + result.html.substring(scriptMatch.index + scriptMatch[0].length)).trim();
         }
     }
 
-    // 6. Clean up code blocks
-    const cleanCode = (code, type) => {
-        if (!code) return null;
-
-        // Strip wrapper tags for HTML
-        if (type === 'html') {
-            // Aggressively remove <body>, <html>, <head> and <style> tags (including any with attributes)
-            code = code.replace(/<body[^>]*>/gi, '').replace(/<\/body>/gi, '');
-            code = code.replace(/<html[^>]*>/gi, '').replace(/<\/html>/gi, '');
-            code = code.replace(/<head[^>]*>/gi, '').replace(/<\/head>/gi, '');
-            code = code.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
-        }
-
-        // Strip chatty command lines at start
-        const lines = code.split('\n');
-        let startIndex = 0;
-
-        // Log first line bytes for debugging
-        if (lines.length > 0) {
-            const firstLine = lines[0].trim();
-            const hex = Buffer.from(firstLine).toString('hex');
-            try {
-                const logPath = path.join(__dirname, 'debug_extraction.log');
-                fs.appendFileSync(logPath, `CleanCode Check: "${firstLine}" Hex: ${hex}\n`);
-            } catch (e) { }
-        }
-
-        while (startIndex < lines.length) {
-            const line = lines[startIndex].trim();
-            if (!line) {
-                startIndex++;
-                continue;
-            }
-            // Skip lines starting with ( or Note: or Here is... AND aggressive filter for known bad strings
-            if (line.startsWith('(') || line.startsWith('Note:') || line.match(/^Here is/i) || line.match(/^Sure,/i) ||
-                line.match(/body content only/i) || line.match(/no html\/head\/body tags/i)) {
-                startIndex++;
-            } else {
-                break;
-            }
-        }
-        return lines.slice(startIndex).join('\n').trim();
-    };
-
-    // Apply cleanup again after extraction to catch nested boilerplate or chatty lines
     result.html = cleanCode(result.html, 'html');
     result.css = cleanCode(result.css, 'css');
     result.js = cleanCode(result.js, 'js');
@@ -409,60 +347,29 @@ IMPORTANT:
             let parsed = { html: null, css: null, js: null };
 
             if (data.html || data.css || data.js) {
-                // Backend provided pre-parsed fields, but they may contain AI hallucinated placeholders
-                parsed.html = data.html || null;
-                parsed.css = data.css || null;
-                parsed.js = data.js || null;
-
-                // Helper to clean placeholders specifically sent by Qwen Instruct
-                const cleanBlock = (code) => {
-                    if (!code) return null;
-                    let c = code.trim();
-
-                    // Remove the placeholder if it appears at the start of the code
-                    const prefixesToRemove = [
-                        '(body content only, no html/head/body tags)',
-                        '<body content only, no html/head/body tags>',
-                        '(complete styles)',
-                        '<complete styles>',
-                        '(complete JavaScript)',
-                        '<complete JavaScript>',
-                        '(JavaScript code)'
-                    ];
-
-                    for (const prefix of prefixesToRemove) {
-                        if (c.startsWith(prefix)) {
-                            c = c.substring(prefix.length).trim();
-                        }
-                    }
-
-                    return c || null; // Return null if the code is now empty
-                };
-
-                parsed.html = cleanBlock(parsed.html);
-                parsed.css = cleanBlock(parsed.css);
-                parsed.js = cleanBlock(parsed.js);
-
+                parsed.html = cleanBlock(data.html || null);
+                parsed.css = cleanBlock(data.css || null);
+                parsed.js = cleanBlock(data.js || null);
             } else if (rawText) {
                 parsed = parseCodeBlocks(rawText);
             }
 
+            // Consistently apply aggressive cleanup to all parsed blocks
+            parsed.html = cleanCode(parsed.html, 'html');
+            parsed.css = cleanCode(parsed.css, 'css');
+            parsed.js = cleanCode(parsed.js, 'js');
+
             // Logic to avoid echoing identical code in the chat UI
-            // If the "newly generated" code is exactly the same as what's already there, 
-            // we treat it as "no change" for the chat display.
             if (parsed.html === room.html) parsed.html = null;
             if (parsed.css === room.css) parsed.css = null;
             if (parsed.js === room.js) parsed.js = null;
 
-            // Update room data with AI-generated code (only if new code was found)
-            room.html = parsed.html || room.html;
-            room.css = parsed.css || room.css;
-            room.js = parsed.js || room.js;
+            // DO NOT update room.html/css/js here. 
+            // We only send it to the chat UI for the user to manually review.
 
             console.log(`🤖 AI generated code in ${data.time_ms}ms for room ${roomId}`);
 
             // Broadcast ONLY the newly generated code to the frontend chat UI
-            // If the AI didn't generate code for a file, it will be null here (which is correct)
             io.to(roomId).emit('ai-result', {
                 html: parsed.html,
                 css: parsed.css,
