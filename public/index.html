@@ -2088,7 +2088,30 @@
             dom.chatMessages.innerHTML = '';
             data.messages.forEach(msg => renderMessage(msg));
             dom.chatMessages.scrollTop = dom.chatMessages.scrollHeight;
+
+            // Reset AI History for new room
+            resetAiHistory();
         });
+
+        function resetAiHistory() {
+            dom.aiHistory.innerHTML = `
+                <!-- Beta Warning -->
+                <div class="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-3 flex items-start gap-2">
+                    <svg class="w-5 h-5 text-yellow-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <div class="text-[10px] text-yellow-200/80 leading-relaxed">
+                        <span class="font-bold text-yellow-500 block mb-0.5">Beta Feature</span>
+                        AI may generate incorrect code. Always verify output before using in production.
+                    </div>
+                </div>
+                <!-- Welcome Message -->
+                <div class="ai-response-bubble text-sm">
+                    Hello! I'm your AI coding assistant. I can write HTML, CSS, and JS for you. What shall we build?
+                </div>
+            `;
+            dom.aiHistory.scrollTop = 0;
+        }
 
         // Receive real-time code updates from other users
         socket.on('code-update', ({ lang, value }) => {
@@ -2436,6 +2459,10 @@
             currentRoomId = null;
             localUser = null;
             window.location.hash = '';
+
+            // Reset UI states
+            resetAiHistory();
+            dom.chatMessages.innerHTML = '';
 
             window.removeEventListener('beforeunload', handleBeforeUnload);
             window.removeEventListener('message', handleConsoleMessage);
