@@ -100,3 +100,8 @@ This project is open-source and available under the standard MIT License.
 ---
 
 *Built with passion by developers, for developers.*
+
+## Acknowledgements
+This project is a new and expanded version of my original collaborative editor, Codependal. It builds upon the core ideas of simplicity and real-time collaboration that I explored in that initial project.
+
+[Codependal Repository](https://github.com/Abhay557/Codependal)
