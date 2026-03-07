@@ -403,19 +403,33 @@ Please generate the complete updated code based on the user's request. If the us
             const data = await response.json();
 
             // Parse AI response into separate HTML/CSS/JS blocks
-            // The backend may return pre-parsed fields OR a raw text response
             const rawText = data.raw || data.response || data.text || data.generated_text || '';
             let parsed = { html: null, css: null, js: null };
 
-            // If backend provides separate fields, use them
             if (data.html || data.css || data.js) {
+                // Backend provided pre-parsed fields, but they may contain AI hallucinated placeholders
                 parsed.html = data.html || null;
                 parsed.css = data.css || null;
                 parsed.js = data.js || null;
-            }
 
-            // If no separate fields found (or all null), parse from raw text
-            if (!parsed.html && !parsed.css && !parsed.js && rawText) {
+                // Helper to clean placeholders specifically sent by Qwen Instruct
+                const cleanBlock = (code) => {
+                    if (!code) return null;
+                    const c = code.trim();
+                    if (c === '(body content only, no html/head/body tags)' ||
+                        c === '(complete styles)' ||
+                        c === '(complete JavaScript)' ||
+                        c === '(JavaScript code)') {
+                        return null;
+                    }
+                    return code; // parseCodeBlocks handles the heavy cleanup if rawText is used
+                };
+
+                parsed.html = cleanBlock(parsed.html);
+                parsed.css = cleanBlock(parsed.css);
+                parsed.js = cleanBlock(parsed.js);
+
+            } else if (rawText) {
                 parsed = parseCodeBlocks(rawText);
             }
 

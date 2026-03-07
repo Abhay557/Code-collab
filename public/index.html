@@ -2195,6 +2195,14 @@
             dom.aiHistory.appendChild(responseDiv);
             dom.aiHistory.scrollTop = dom.aiHistory.scrollHeight;
 
+            // Actually insert the code into the editors
+            isRemoteUpdate = true;
+            if (html && htmlEditor.getValue() !== html) htmlEditor.setValue(html);
+            if (css && cssEditor.getValue() !== css) cssEditor.setValue(css);
+            if (js && jsEditor.getValue() !== js) jsEditor.setValue(js);
+            isRemoteUpdate = false;
+            updateIframe();
+
             showNotification('AI code generated!', 'success');
         });
 
