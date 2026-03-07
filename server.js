@@ -440,11 +440,12 @@ Please generate the complete updated code based on the user's request. If the us
 
             console.log(`🤖 AI generated code in ${data.time_ms}ms for room ${roomId}`);
 
-            // Broadcast generated code to ALL users in the room
+            // Broadcast ONLY the newly generated code to the frontend chat UI
+            // If the AI didn't generate code for a file, it will be null here (which is correct)
             io.to(roomId).emit('ai-result', {
-                html: room.html,
-                css: room.css,
-                js: room.js,
+                html: parsed.html,
+                css: parsed.css,
+                js: parsed.js,
                 prompt,
                 rawResponse: data.raw || '',
                 user: currentUser.name
