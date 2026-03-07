@@ -4,6 +4,9 @@ Code Collab is a fast, frictionless, real-time collaborative web IDE. It allows 
 
 Designed for speed and simplicity, Code Collab requires no sign-ups or installations. It also features a built-in AI Assistant powered by Hugging Face to help you generate, debug, and refactor code on the fly.
 
+![Preview](preview.png)
+
+
 ---
 
 ##  Features
