@@ -415,14 +415,26 @@ Please generate the complete updated code based on the user's request. If the us
                 // Helper to clean placeholders specifically sent by Qwen Instruct
                 const cleanBlock = (code) => {
                     if (!code) return null;
-                    const c = code.trim();
-                    if (c === '(body content only, no html/head/body tags)' ||
-                        c === '(complete styles)' ||
-                        c === '(complete JavaScript)' ||
-                        c === '(JavaScript code)') {
-                        return null;
+                    let c = code.trim();
+
+                    // Remove the placeholder if it appears at the start of the code
+                    const prefixesToRemove = [
+                        '(body content only, no html/head/body tags)',
+                        '<body content only, no html/head/body tags>',
+                        '(complete styles)',
+                        '<complete styles>',
+                        '(complete JavaScript)',
+                        '<complete JavaScript>',
+                        '(JavaScript code)'
+                    ];
+
+                    for (const prefix of prefixesToRemove) {
+                        if (c.startsWith(prefix)) {
+                            c = c.substring(prefix.length).trim();
+                        }
                     }
-                    return code; // parseCodeBlocks handles the heavy cleanup if rawText is used
+
+                    return c || null; // Return null if the code is now empty
                 };
 
                 parsed.html = cleanBlock(parsed.html);
