@@ -256,13 +256,10 @@ function parseCodeBlocks(text) {
         return lines.slice(startIndex).join('\n').trim();
     };
 
+    // Apply cleanup again after extraction to catch nested boilerplate or chatty lines
     result.html = cleanCode(result.html, 'html');
     result.css = cleanCode(result.css, 'css');
     result.js = cleanCode(result.js, 'js');
-
-    console.log('--- PARSED RESULT ---');
-    console.log(result);
-    console.log('---------------------');
 
     return result;
 }
@@ -382,7 +379,13 @@ ${room.js}
 ${consoleSection}
 User's request: "${prompt}"
 
-Please generate the complete updated code based on the user's request. If the user is asking to fix or debug their code, analyze the existing code, the console output, and provide corrected versions. Always respond with separate \`\`\`html, \`\`\`css, and \`\`\`js code blocks.`;
+Please generate the complete updated code based on the user's request. 
+IMPORTANT: 
+1. Do NOT include <html>, <head>, or <body> tags in your HTML output. 
+2. Only provide the content that goes INSIDE the <body> tag.
+3. If the user is asking to fix or debug their code, analyze the existing code and console output.
+4. Always respond with separate \`\`\`html, \`\`\`css, and \`\`\`js code blocks.
+5. If a block (HTML, CSS, or JS) remains unchanged, you may omit it or provide it as-is.`;
 
         try {
             const response = await fetch(`${AI_BACKEND}/generate`, {
