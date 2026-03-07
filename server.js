@@ -218,12 +218,11 @@ function parseCodeBlocks(text) {
 
         // Strip wrapper tags for HTML
         if (type === 'html') {
-            // Remove <body> wrappers (standard and AI hallucinations like <body content-only>)
-            code = code.replace(/<body[^>]*>/i, '').replace(/<\/body>/i, '');
-            // Remove <html> wrappers
-            code = code.replace(/<html[^>]*>/i, '').replace(/<\/html>/i, '');
-            // Remove <head> wrappers
-            code = code.replace(/<head[^>]*>/i, '').replace(/<\/head>/i, '');
+            // Aggressively remove <body>, <html>, <head> and <style> tags (including any with attributes)
+            code = code.replace(/<body[^>]*>/gi, '').replace(/<\/body>/gi, '');
+            code = code.replace(/<html[^>]*>/gi, '').replace(/<\/html>/gi, '');
+            code = code.replace(/<head[^>]*>/gi, '').replace(/<\/head>/gi, '');
+            code = code.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
         }
 
         // Strip chatty command lines at start
@@ -444,6 +443,13 @@ Please generate the complete updated code based on the user's request. If the us
             } else if (rawText) {
                 parsed = parseCodeBlocks(rawText);
             }
+
+            // Logic to avoid echoing identical code in the chat UI
+            // If the "newly generated" code is exactly the same as what's already there, 
+            // we treat it as "no change" for the chat display.
+            if (parsed.html === room.html) parsed.html = null;
+            if (parsed.css === room.css) parsed.css = null;
+            if (parsed.js === room.js) parsed.js = null;
 
             // Update room data with AI-generated code (only if new code was found)
             room.html = parsed.html || room.html;
