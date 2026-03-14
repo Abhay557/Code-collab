@@ -30,6 +30,8 @@ function createRoom(roomId, isPublic) {
         participants: [],
         messages: [],
         consoleLogs: [],
+        history: [],            // Time-travel snapshots
+        historyTimer: null,     // Debounce timer for snapshots
         createdAt: new Date()
     };
     rooms.set(roomId, room);
@@ -252,6 +254,32 @@ io.on('connection', (socket) => {
 
         // Broadcast to everyone EXCEPT the sender
         socket.to(roomId).emit('code-update', { lang, value });
+
+        // Debounced snapshot for time-travel (save every 10 seconds of activity)
+        if (room.historyTimer) clearTimeout(room.historyTimer);
+        room.historyTimer = setTimeout(() => {
+            room.history.push({
+                html: room.html,
+                css: room.css,
+                js: room.js,
+                timestamp: new Date().toISOString(),
+                user: currentUser ? currentUser.name : 'Unknown'
+            });
+            // Cap at 50 entries
+            if (room.history.length > 50) room.history.shift();
+        }, 10000);
+    });
+
+    // Cursor sharing
+    socket.on('cursor-move', ({ roomId, lang, line, ch }) => {
+        if (!currentUser) return;
+        socket.to(roomId).emit('remote-cursor', {
+            uid: currentUser.uid,
+            name: currentUser.name,
+            lang,
+            line,
+            ch
+        });
     });
 
     // Console log from iframe (client sends these so AI can see them)
@@ -393,9 +421,110 @@ CRITICAL RULES:
         }
     });
 
+    // AI Code Review
+    socket.on('ai-review', async ({ roomId }) => {
+        const room = getRoomData(roomId);
+        if (!room || !currentUser) return;
+
+        const AI_BACKEND = process.env.AI_BACKEND_URL;
+        if (!AI_BACKEND || AI_BACKEND === 'https://your-space.hf.space') {
+            socket.emit('ai-error', 'AI backend URL not configured.');
+            return;
+        }
+
+        io.to(roomId).emit('ai-status', { status: 'generating', prompt: 'Code Review', user: currentUser.name });
+
+        const reviewPrompt = `You are a senior code reviewer. Analyze the following code for:
+1. Bugs and potential errors
+2. Best practices violations
+3. Accessibility issues
+4. Performance concerns
+5. Security vulnerabilities
+
+Provide a concise, actionable review. Use bullet points. Do NOT rewrite the code — only give text feedback.
+
+HTML:
+\`\`\`html
+${room.html}
+\`\`\`
+
+CSS:
+\`\`\`css
+${room.css}
+\`\`\`
+
+JavaScript:
+\`\`\`js
+${room.js}
+\`\`\`
+
+Respond with ONLY the review feedback as plain text with bullet points. No code blocks.`;
+
+        try {
+            const response = await fetch(`${AI_BACKEND}/generate`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt: reviewPrompt, max_tokens: 2048, temperature: 0.3 })
+            });
+
+            if (!response.ok) {
+                const errText = await response.text();
+                console.error('AI review backend error:', response.status, errText);
+                socket.emit('ai-error', `AI service error (${response.status}). Try again.`);
+                io.to(roomId).emit('ai-status', { status: 'error' });
+                return;
+            }
+
+            const data = await response.json();
+            const reviewText = data.raw || data.response || data.text || data.generated_text || 'No review generated.';
+
+            io.to(roomId).emit('ai-review-result', {
+                review: reviewText,
+                user: currentUser.name
+            });
+
+        } catch (err) {
+            console.error('AI review error:', err);
+            socket.emit('ai-error', 'Failed to connect to AI service for review.');
+            io.to(roomId).emit('ai-status', { status: 'error' });
+        }
+    });
+
     // Leave room
     socket.on('leave-room', () => {
         handleDisconnect();
+    });
+
+    // Time-Travel: Get history
+    socket.on('get-history', ({ roomId }) => {
+        const room = getRoomData(roomId);
+        if (!room) return;
+        socket.emit('history-list', room.history);
+    });
+
+    // Time-Travel: Restore snapshot
+    socket.on('restore-snapshot', ({ roomId, index }) => {
+        const room = getRoomData(roomId);
+        if (!room || !room.history[index]) return;
+
+        const snapshot = room.history[index];
+        room.html = snapshot.html;
+        room.css = snapshot.css;
+        room.js = snapshot.js;
+
+        // Broadcast restored state to all users
+        io.to(roomId).emit('room-state', {
+            html: room.html,
+            css: room.css,
+            js: room.js,
+            participants: room.participants,
+            messages: room.messages
+        });
+
+        io.to(roomId).emit('snapshot-restored', {
+            user: currentUser ? currentUser.name : 'Someone',
+            timestamp: snapshot.timestamp
+        });
     });
 
     // Disconnect (tab close, network drop)

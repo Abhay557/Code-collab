@@ -220,6 +220,29 @@
                 0 0 80px -20px rgba(249, 115, 22, 0.2);
         }
 
+        /* ─── Remote Cursors ─── */
+        .remote-cursor {
+            position: absolute;
+            width: 2px;
+            z-index: 10;
+            pointer-events: none;
+        }
+        .remote-cursor-label {
+            position: absolute;
+            top: -18px;
+            left: 0;
+            font-size: 10px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            padding: 1px 5px;
+            border-radius: 3px 3px 3px 0;
+            white-space: nowrap;
+            color: #fff;
+            line-height: 14px;
+            pointer-events: none;
+            opacity: 0.9;
+        }
+
         /* ─── Gradient Buttons ─── */
         .btn-primary {
             background: linear-gradient(135deg, #f97316 0%, #f59e0b 100%);
@@ -1622,6 +1645,20 @@
                 <div id="output-panel" class="relative bg-white rounded-lg overflow-hidden" style="flex-basis: 50%;">
                     <iframe id="output-frame" class="w-full h-full border-0"></iframe>
                     <div class="absolute bottom-4 right-4 flex gap-2">
+                        <button id="history-btn" title="Time-Travel History"
+                            class="bg-gray-700 text-white hover:bg-orange-600 rounded-full p-3 shadow-lg transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </button>
+                        <button id="safe-mode-btn" title="Toggle Safe Mode (disable JS)"
+                            class="bg-gray-700 text-white hover:bg-orange-600 rounded-full p-3 shadow-lg transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                            </svg>
+                        </button>
                         <button id="download-btn" title="Download Code"
                             class="bg-gray-700 text-white hover:bg-orange-600 rounded-full p-3 shadow-lg transition-colors"><svg
                                 xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
@@ -1636,6 +1673,26 @@
                                 <path stroke-linecap="round" stroke-linejoin="round"
                                     d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                             </svg></button>
+                    </div>
+
+                    <!-- History Panel Overlay -->
+                    <div id="history-panel" class="hidden absolute inset-0 bg-gray-900/95 backdrop-blur-sm z-20 flex flex-col">
+                        <div class="p-4 border-b border-gray-700 flex items-center justify-between">
+                            <h3 class="text-white font-bold text-sm flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                Time-Travel History
+                            </h3>
+                            <button id="history-close-btn" class="text-gray-400 hover:text-white">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div id="history-list" class="flex-1 overflow-y-auto p-4 space-y-2">
+                            <p class="text-gray-500 text-sm text-center">No snapshots yet. Start editing to create history.</p>
+                        </div>
                     </div>
                 </div>
 
@@ -1777,16 +1834,25 @@
         </div>
 
         <!-- Input -->
-        <form id="ai-form" class="p-4 border-t border-gray-700/50 bg-gray-900/50 rounded-b-2xl">
-            <div class="relative">
+        <form id="ai-form" class="p-3 border-t border-gray-700/50 bg-gray-900/50 rounded-b-2xl">
+            <div class="flex gap-2 mb-2">
                 <input type="text" id="ai-input" placeholder="Describe what to build..." autocomplete="off"
-                    class="w-full bg-gray-800 border border-gray-700 text-white pl-4 pr-12 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 text-sm shadow-inner placeholder-gray-500">
+                    class="flex-1 bg-gray-800 border border-gray-700 text-white pl-4 pr-4 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 text-sm shadow-inner placeholder-gray-500">
+            </div>
+            <div class="flex gap-2">
                 <button type="submit" id="ai-submit-btn"
-                    class="absolute right-2 top-1.5 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400 text-white p-1.5 rounded-lg shadow-lg shadow-orange-500/20 transition-all hover:scale-105">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                        <path
-                            d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.428A1 1 0 009.894 15V4.106A1 1 0 0010.894 2.553z" />
+                    class="flex-1 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400 text-white py-2 px-3 rounded-lg shadow-lg shadow-orange-500/20 transition-all hover:scale-[1.02] text-xs font-semibold flex items-center justify-center gap-1.5" title="Generate Code">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.428A1 1 0 009.894 15V4.106A1 1 0 0010.894 2.553z" />
                     </svg>
+                    Generate
+                </button>
+                <button type="button" id="ai-review-btn"
+                    class="flex-1 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-400 hover:to-cyan-400 text-white py-2 px-3 rounded-lg shadow-lg shadow-blue-500/20 transition-all hover:scale-[1.02] text-xs font-semibold flex items-center justify-center gap-1.5" title="Review Code">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    Review
                 </button>
             </div>
         </form>
@@ -1839,12 +1905,18 @@
             aiForm: document.getElementById('ai-form'),
             aiInput: document.getElementById('ai-input'),
             aiSubmitBtn: document.getElementById('ai-submit-btn'),
+            aiReviewBtn: document.getElementById('ai-review-btn'),
             aiLoading: document.getElementById('ai-loading'),
             aiLoadingText: document.getElementById('ai-loading-text'),
             toggleAiBtn: document.getElementById('toggle-ai-btn'),
             editorPanel: document.getElementById('editor-panel'),
             outputPanel: document.getElementById('output-panel'),
             resizer: document.getElementById('resizer'),
+            safeModeBtn: document.getElementById('safe-mode-btn'),
+            historyBtn: document.getElementById('history-btn'),
+            historyPanel: document.getElementById('history-panel'),
+            historyCloseBtn: document.getElementById('history-close-btn'),
+            historyList: document.getElementById('history-list'),
             downloadBtn: document.getElementById('download-btn'),
             popoutBtn: document.getElementById('popout-btn'),
             contentWrapper: document.getElementById('content-wrapper')
@@ -1858,6 +1930,8 @@
         let isAiOpen = false;
         let isRemoteUpdate = false; // flag to prevent echo loops
         let isAiGenerating = false;
+        let isSafeModeOn = false;
+        let heartbeatTimer = null;
 
         // ─── Utility Functions ────────────────────────────────────────────
         function showView(viewName) {
@@ -2060,13 +2134,53 @@
                 if (!isRemoteUpdate) handleCodeChange('js', jsEditor.getValue());
             });
 
+            // Cursor sharing: emit position on cursor activity
+            const emitCursor = (lang, editor) => {
+                const pos = editor.getCursor();
+                socket.emit('cursor-move', { roomId, lang, line: pos.line, ch: pos.ch });
+            };
+            htmlEditor.on('cursorActivity', () => emitCursor('html', htmlEditor));
+            cssEditor.on('cursorActivity', () => emitCursor('css', cssEditor));
+            jsEditor.on('cursorActivity', () => emitCursor('js', jsEditor));
+
             // General event listeners
             dom.chatForm.addEventListener('submit', handleSendMessage);
             dom.aiForm.addEventListener('submit', handleAiSubmit);
+            dom.aiReviewBtn.addEventListener('click', () => {
+                if (!currentRoomId || isAiGenerating) return;
+                isAiGenerating = true;
+                dom.aiSubmitBtn.disabled = true;
+                dom.aiReviewBtn.disabled = true;
+                socket.emit('ai-review', { roomId: currentRoomId });
+
+                const promptDiv = document.createElement('div');
+                promptDiv.className = 'ai-prompt-bubble text-white text-xs';
+                promptDiv.innerHTML = `<span class="font-bold">${localUser.name}:</span> 🔍 Code Review`;
+                dom.aiHistory.appendChild(promptDiv);
+            });
             dom.leaveBtn.addEventListener('click', leaveRoom);
             dom.clearConsoleBtn.addEventListener('click', () => dom.console.innerHTML = '');
             dom.downloadBtn.addEventListener('click', handleDownload);
             dom.popoutBtn.addEventListener('click', handlePopout);
+            dom.safeModeBtn.addEventListener('click', () => {
+                isSafeModeOn = !isSafeModeOn;
+                dom.safeModeBtn.classList.toggle('bg-orange-600', isSafeModeOn);
+                dom.safeModeBtn.classList.toggle('bg-gray-700', !isSafeModeOn);
+                dom.safeModeBtn.title = isSafeModeOn ? 'Safe Mode ON (JS disabled)' : 'Toggle Safe Mode (disable JS)';
+                showNotification(isSafeModeOn ? '🛡️ Safe Mode ON — JS disabled in preview' : '🛡️ Safe Mode OFF — JS enabled', 'info');
+                updateIframe();
+            });
+
+            // History panel toggle
+            dom.historyBtn.addEventListener('click', () => {
+                dom.historyPanel.classList.toggle('hidden');
+                if (!dom.historyPanel.classList.contains('hidden')) {
+                    socket.emit('get-history', { roomId });
+                }
+            });
+            dom.historyCloseBtn.addEventListener('click', () => {
+                dom.historyPanel.classList.add('hidden');
+            });
 
             window.addEventListener('message', handleConsoleMessage);
             window.addEventListener('beforeunload', handleBeforeUnload);
@@ -2124,6 +2238,48 @@
             editor.scrollTo(scrollInfo.left, scrollInfo.top);
             isRemoteUpdate = false;
             updateIframe();
+        });
+
+        // ─── Remote Cursor Rendering ─────────────────────────────────────
+        const remoteCursors = {}; // { uid: { bookmark, lang } }
+
+        const CURSOR_COLORS = ['#f97316','#3b82f6','#22c55e','#a855f7','#ec4899','#14b8a6','#eab308','#ef4444'];
+        function getCursorColor(uid) {
+            let hash = 0;
+            for (let i = 0; i < uid.length; i++) hash = uid.charCodeAt(i) + ((hash << 5) - hash);
+            return CURSOR_COLORS[Math.abs(hash) % CURSOR_COLORS.length];
+        }
+
+        socket.on('remote-cursor', ({ uid, name, lang, line, ch }) => {
+            // Remove old bookmark for this user
+            if (remoteCursors[uid] && remoteCursors[uid].bookmark) {
+                remoteCursors[uid].bookmark.clear();
+            }
+
+            const editor = lang === 'html' ? htmlEditor : lang === 'css' ? cssEditor : jsEditor;
+            if (!editor) return;
+
+            const color = getCursorColor(uid);
+
+            // Create cursor element
+            const cursorEl = document.createElement('span');
+            cursorEl.className = 'remote-cursor';
+            cursorEl.style.borderLeft = `2px solid ${color}`;
+            cursorEl.style.height = '18px';
+            cursorEl.style.display = 'inline-block';
+
+            // Name label
+            const label = document.createElement('span');
+            label.className = 'remote-cursor-label';
+            label.textContent = name;
+            label.style.backgroundColor = color;
+            cursorEl.appendChild(label);
+
+            const bookmark = editor.setBookmark({ line, ch }, { widget: cursorEl, insertLeft: true });
+            remoteCursors[uid] = { bookmark, lang };
+
+            // Auto-fade label after 3 seconds
+            setTimeout(() => { if (label) label.style.opacity = '0'; }, 3000);
         });
 
         // Receive participant updates
@@ -2224,6 +2380,7 @@
         socket.on('ai-error', (msg) => {
             dom.aiLoading.classList.add('hidden');
             dom.aiSubmitBtn.disabled = false;
+            if (dom.aiReviewBtn) dom.aiReviewBtn.disabled = false;
             isAiGenerating = false;
             showNotification(msg);
 
@@ -2233,11 +2390,75 @@
             dom.aiHistory.appendChild(errorDiv);
         });
 
+        // AI Code Review result
+        socket.on('ai-review-result', ({ review, user }) => {
+            dom.aiLoading.classList.add('hidden');
+            dom.aiSubmitBtn.disabled = false;
+            if (dom.aiReviewBtn) dom.aiReviewBtn.disabled = false;
+            isAiGenerating = false;
+
+            const responseDiv = document.createElement('div');
+            responseDiv.className = 'ai-response-bubble text-gray-200 text-xs';
+
+            const header = document.createElement('div');
+            header.innerHTML = '<span class="text-blue-400 font-bold">🔍 Code Review</span>';
+            header.style.marginBottom = '8px';
+            responseDiv.appendChild(header);
+
+            const content = document.createElement('div');
+            content.style.whiteSpace = 'pre-wrap';
+            content.style.lineHeight = '1.6';
+            content.textContent = review;
+            responseDiv.appendChild(content);
+
+            dom.aiHistory.appendChild(responseDiv);
+            dom.aiHistory.scrollTop = dom.aiHistory.scrollHeight;
+
+            showNotification('🔍 Code review complete!', 'success');
+        });
+
         function escapeHtml(text) {
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
         }
+
+        // ─── Time-Travel History Listeners ─────────────────────────────
+        socket.on('history-list', (history) => {
+            if (!dom.historyList) return;
+            if (!history || history.length === 0) {
+                dom.historyList.innerHTML = '<p class="text-gray-500 text-sm text-center py-8">No snapshots yet. Start editing to create history.</p>';
+                return;
+            }
+            dom.historyList.innerHTML = '';
+            history.slice().reverse().forEach((snap, reverseIdx) => {
+                const realIndex = history.length - 1 - reverseIdx;
+                const time = new Date(snap.timestamp);
+                const timeStr = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+                const item = document.createElement('div');
+                item.className = 'bg-gray-800 border border-gray-700 rounded-lg p-3 hover:border-orange-500/50 transition-colors';
+                item.innerHTML = `
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-orange-400 text-xs font-mono">${timeStr}</span>
+                        <span class="text-gray-400 text-[10px]">${snap.user}</span>
+                    </div>
+                    <div class="text-gray-500 text-[10px] mb-2">Snapshot #${realIndex + 1}</div>
+                    <button class="restore-btn w-full text-center bg-orange-500/20 text-orange-400 text-xs py-1.5 rounded-md hover:bg-orange-500/30 transition-colors font-medium">Restore this version</button>
+                `;
+                item.querySelector('.restore-btn').addEventListener('click', () => {
+                    if (confirm('Restore this snapshot? This will replace the current code for all users.')) {
+                        socket.emit('restore-snapshot', { roomId: currentRoomId, index: realIndex });
+                        dom.historyPanel.classList.add('hidden');
+                    }
+                });
+                dom.historyList.appendChild(item);
+            });
+        });
+
+        socket.on('snapshot-restored', ({ user, timestamp }) => {
+            showNotification(`⏱️ ${user} restored a snapshot from ${new Date(timestamp).toLocaleTimeString()}`, 'info');
+        });
 
         // ─── Code Change Handler (debounced, sends to server) ─────────────
         function handleCodeChange(lang, value) {
@@ -2287,13 +2508,36 @@
         // ─── iframe Preview ───────────────────────────────────────────────
         function updateIframe() {
             if (!htmlEditor || !cssEditor || !jsEditor) return;
+            // Clear any pending heartbeat timer
+            if (heartbeatTimer) { clearTimeout(heartbeatTimer); heartbeatTimer = null; }
+
             const consoleScript = `
-        <script>const f=a=>{if(a instanceof Error)return a.stack||a.message;if(typeof a==='object'&&a!==null)try{return JSON.stringify(a)}catch(e){return'[Unserializable]'}return String(a)};const o=(m,t)=>{const c=console[m];console[m]=(...a)=>{window.parent.postMessage({s:'iframe-console',t,m:a.map(f).join(' ')},'*');c.apply(console,a)}};['log','error','warn','info'].forEach(m=>o(m,m));window.addEventListener('error',e=>window.parent.postMessage({s:'iframe-console',t:'error',m:e.message},'*'));<\/script>`;
-            const content = `<html><head><style>${cssEditor.getValue()}<\/style>${consoleScript}<\/head><body>${htmlEditor.getValue()}<script>try{${jsEditor.getValue()}}catch(e){console.error(e);}<\/script><\/body><\/html>`;
+        <scr` + `ipt>const f=a=>{if(a instanceof Error)return a.stack||a.message;if(typeof a==='object'&&a!==null)try{return JSON.stringify(a)}catch(e){return'[Unserializable]'}return String(a)};const o=(m,t)=>{const c=console[m];console[m]=(...a)=>{window.parent.postMessage({s:'iframe-console',t,m:a.map(f).join(' ')},'*');c.apply(console,a)}};['log','error','warn','info'].forEach(m=>o(m,m));window.addEventListener('error',e=>window.parent.postMessage({s:'iframe-console',t:'error',m:e.message},'*'));</scr` + `ipt>`;
+
+            const jsCode = isSafeModeOn ? '// Safe Mode: JS execution disabled' : jsEditor.getValue();
+            const heartbeatScript = isSafeModeOn ? '' : '<scr' + 'ipt>window.parent.postMessage({s:"iframe-heartbeat"},"*");</scr' + 'ipt>';
+            const content = '<html><head><style>' + cssEditor.getValue() + '</style>' + consoleScript + '</head><body>' + htmlEditor.getValue() + '<scr' + 'ipt>try{' + jsCode + '}catch(e){console.error(e);}</scr' + 'ipt>' + heartbeatScript + '</body></html>';
             dom.output.srcdoc = content;
+
+            // Start heartbeat timer (only if JS is enabled)
+            if (!isSafeModeOn) {
+                heartbeatTimer = setTimeout(() => {
+                    // No heartbeat received — iframe is likely frozen
+                    dom.output.srcdoc = `<html><body style="display:flex;align-items:center;justify-content:center;height:100vh;margin:0;font-family:sans-serif;background:#1e293b;color:#f87171;"><div style="text-align:center"><h2>⚠️ Script Killed</h2><p>Possible infinite loop detected. JS execution was stopped.</p><p style="color:#94a3b8;font-size:14px">Toggle Safe Mode to preview without JS.</p></div></body></html>`;
+                    showNotification('⚠️ Script killed — possible infinite loop detected!', 'error');
+                }, 5000);
+            }
         }
 
         function handleConsoleMessage({ source, data }) {
+            if (!data || typeof data !== 'object') return;
+
+            // Handle heartbeat
+            if (data.s === 'iframe-heartbeat') {
+                if (heartbeatTimer) { clearTimeout(heartbeatTimer); heartbeatTimer = null; }
+                return;
+            }
+
             if (source !== dom.output.contentWindow || data.s !== 'iframe-console') return;
             const logEntry = document.createElement('div');
             logEntry.textContent = data.m;
