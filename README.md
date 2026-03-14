@@ -6,6 +6,7 @@ Designed for speed and simplicity, Code Collab requires no sign-ups or installat
 
 ![Preview](preview.png)
 
+***Official Copyright Registered: The source code and architecture of Code Collab are officially registered and protected by the Intellectual Property Office, Government of India (Registered 2026).***
 
 ---
 
@@ -37,41 +38,32 @@ Designed for speed and simplicity, Code Collab requires no sign-ups or installat
 
 ##  Getting Started
 
-### Prerequisites
-
-- Node.js installed on your machine.
-- A Hugging Face account and Access Token (for the AI features).
-
 ### Installation
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/abhay557/code-collab.git
-   cd code-collab
-   ```
+1. Clone the repository
+```
+git clone [https://github.com/Abhay557/Code-collab.git](https://github.com/Abhay557/Code-collab.git)
+cd Code-collab
+```
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
+2. Install dependencies
+```
+npm install
+```
 
-3. **Set up Environment Variables**
-   Create a `.env` file in the root of the project and add your Hugging Face token:
-   ```env
-   HF_TOKEN=your_hugging_face_access_token_here
-   ```
-   this step is not needed make and connect your backend from
-   ```https://huggingface.co/spaces/Abhay557/code-collab/```
-5. **Start the Development Server**
-   ```bash
-   npm run dev
-   # or
-   npm start
-   ```
+3. Start the Development Server
+```
+npm run dev
+# or
+npm start
+```
 
-6. **Open the App**
-   Navigate to `http://localhost:3000` in your web browser.
+**Note on AI Backend: You do not need to set up a local .env file or provide your own Hugging Face API tokens. The application is pre-configured to connect directly to the hosted AI microservice at ```https://huggingface.co/spaces/Abhay557/code-collab/.```**
 
+4. Open the App
+```
+Navigate to http://localhost:3000 in your web browser.
+```
 ---
 
 ##  How to Use
@@ -96,13 +88,15 @@ Contributions are welcome! If you find a bug or have a feature request, please o
 
 ---
 
-##  License
+##  Copyright and License
 
-This project is open-source and available under the standard MIT License.
+***© 2026 Abhay Mahendra Mourya. All Rights Reserved.***
+***This software is officially registered with the Intellectual Property Office, Government of India.***
+***While the intellectual property and core architecture are legally copyrighted, this project is proudly open-source and distributed under the MIT License. You are free to use, modify, and distribute this software, provided that the original copyright notice and permission notice are included in all copies or substantial portions of the software.
+See the ```LICENSE``` file for more information.***
 
 ---
 
-*Built with passion by developers, for developers.*
 
 ## Acknowledgements
 This project is a new and expanded version of my original collaborative editor, Codependal. It builds upon the core ideas of simplicity and real-time collaboration that I explored in that initial project.
