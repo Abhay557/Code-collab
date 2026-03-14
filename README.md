@@ -13,8 +13,13 @@ Designed for speed and simplicity, Code Collab requires no sign-ups or installat
 ##  Features
 
 - **Real-time Collaboration:** Code together in absolute real-time without latency. Cursors and edits sync instantly across all clients in a room.
+- **Cursor Sharing:** See where your collaborators are typing in real-time with color-coded, labeled cursor indicators.
 - **Built-in AI Assistant:** A floating AI panel powered by Hugging Face (`Qwen2.5-Coder`). Describe what you want to build, and the AI will generate the HTML, CSS, and JS, injecting it directly into your editors.
+- **AI Code Review:** Ask the AI to review your current code for bugs, best practices, accessibility, and performance optimizations.
 - **Live Preview & Console:** Instantly view the results of your code in a sandboxed iframe. A built-in console helps you catch and debug JavaScript errors.
+- **Tab-Freeze Security:** Built-in infinite loop protection monitors user JavaScript. If a script runs too long or freezes the iframe, it is automatically terminated. A "Safe Mode" toggle allows you to disable JavaScript entirely.
+- **Time-Travel History:** Changes are automatically saved every 10 seconds. Open the History panel to browse up to 50 previous versions of your room's code.
+- **Manual Snapshots & Diff View:** Explicitly save milestones by forcing a manual snapshot. The UI calculates file-level changes (HTML, CSS, JS) so you know exactly what changed between versions, and you can restore any snapshot with a click.
 - **Zero Friction:** No accounts, no passwords, no setup. Click "Create Room," share the URL, and start coding within seconds.
 - **Export Project:** One-click download of your entire workspace as a zipped `.zip` file, ready to be dropped into VS Code or deployed.
 - **Premium UI:** A beautiful, responsive, and modern interface built with Tailwind CSS, featuring custom CodeMirror themes and warm orange/amber aesthetics.

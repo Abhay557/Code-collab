@@ -364,7 +364,11 @@ CRITICAL RULES:
             const response = await fetch(`${AI_BACKEND}/generate`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ prompt: codeContext, max_tokens: 2048, temperature: 0.7 })
+                body: JSON.stringify({ 
+                    messages: [{ role: 'user', content: codeContext }], 
+                    max_tokens: 2048, 
+                    temperature: 0.7 
+                })
             });
 
             if (!response.ok) {
@@ -378,7 +382,8 @@ CRITICAL RULES:
             const data = await response.json();
 
             // Parse AI response into separate HTML/CSS/JS blocks
-            const rawText = data.raw || data.response || data.text || data.generated_text || '';
+            const chatContent = data.choices && data.choices[0] && data.choices[0].message ? data.choices[0].message.content : null;
+            const rawText = chatContent || data.raw || data.response || data.text || data.generated_text || '';
             let parsed = { html: null, css: null, js: null };
 
             if (data.html || data.css || data.js) {
@@ -464,7 +469,11 @@ Respond with ONLY the review feedback as plain text with bullet points. No code 
             const response = await fetch(`${AI_BACKEND}/generate`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ prompt: reviewPrompt, max_tokens: 2048, temperature: 0.3 })
+                body: JSON.stringify({ 
+                    messages: [{ role: 'user', content: reviewPrompt }], 
+                    max_tokens: 2048, 
+                    temperature: 0.3 
+                })
             });
 
             if (!response.ok) {
@@ -476,7 +485,8 @@ Respond with ONLY the review feedback as plain text with bullet points. No code 
             }
 
             const data = await response.json();
-            const reviewText = data.raw || data.response || data.text || data.generated_text || 'No review generated.';
+            const chatContent = data.choices && data.choices[0] && data.choices[0].message ? data.choices[0].message.content : null;
+            const reviewText = chatContent || data.raw || data.response || data.text || data.generated_text || 'No review generated.';
 
             io.to(roomId).emit('ai-review-result', {
                 review: reviewText,
@@ -493,6 +503,32 @@ Respond with ONLY the review feedback as plain text with bullet points. No code 
     // Leave room
     socket.on('leave-room', () => {
         handleDisconnect();
+    });
+
+    // Time-Travel: Force manual snapshot
+    socket.on('save-snapshot-manual', ({ roomId }) => {
+        const room = getRoomData(roomId);
+        if (!room) return;
+
+        // Force a save immediately
+        if (room.historyTimer) {
+            clearTimeout(room.historyTimer);
+            room.historyTimer = null;
+        }
+
+        room.history.push({
+            html: room.html,
+            css: room.css,
+            js: room.js,
+            timestamp: new Date().toISOString(),
+            user: currentUser ? currentUser.name : 'Unknown',
+            manual: true // flag to indicate it was user-initiated
+        });
+
+        if (room.history.length > 50) room.history.shift();
+
+        // Broadcast updated history right away
+        io.to(roomId).emit('history-list', room.history);
     });
 
     // Time-Travel: Get history

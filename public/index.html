@@ -1113,22 +1113,28 @@
 
             <!-- Feature Cards Section -->
             <div class="features-section">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-5xl mx-auto">
+                <div class="text-center mb-12">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-600 text-xs font-semibold uppercase tracking-wider mb-4">
+                        ✨ Everything you need
+                    </div>
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-3">Features that set us apart</h2>
+                    <p class="text-slate-600 max-w-2xl mx-auto text-sm">From AI-powered coding to time-travel debugging — every tool you need for modern collaborative development, built right in.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 max-w-5xl mx-auto">
                     <!-- Card 1: Real-time Collab -->
                     <div class="feature-card">
                         <div class="feature-icon bg-orange-500/15">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-orange-500" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                             </svg>
                         </div>
-                        <h3 class="text-slate-900 font-bold text-base mb-2">Real-time Collab</h3>
-                        <p class="text-slate-600 text-sm leading-relaxed">Code together in real-time with your team. See
-                            cursor positions, chat inline, and build features simultaneously.</p>
+                        <h3 class="text-slate-900 font-bold text-base mb-2">Real-time Collaboration</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed">Code together in real-time with your team. See live changes, chat inline, and build features simultaneously — no setup required.</p>
                     </div>
 
-                    <!-- Card 2: AI Assistant -->
+                    <!-- Card 2: AI Code Generator -->
                     <div class="feature-card">
                         <div class="feature-icon bg-amber-500/15">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-500" viewBox="0 0 20 20"
@@ -1137,25 +1143,60 @@
                                     d="M10 2a1 1 0 011 1v1.323l3.954 1.582 1.599-.8a1 1 0 01.894 1.79l-1.233.616 1.738 5.42a1 1 0 01-.285 1.05A3.989 3.989 0 0114 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.715-5.349L10 6.477l-2.763 1.105 1.715 5.349a1 1 0 01-.285 1.05A3.989 3.989 0 016 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.738-5.42-1.233-.617a1 1 0 01.894-1.789l1.599.799L10 4.323V3a1 1 0 011-1z" />
                             </svg>
                         </div>
-                        <h3 class="text-slate-900 font-bold text-base mb-2">AI Code Assistant</h3>
-                        <p class="text-slate-600 text-sm leading-relaxed">Describe what to build and let AI generate
-                            HTML, CSS & JS. Debug errors with console context for smarter fixes.</p>
+                        <h3 class="text-slate-900 font-bold text-base mb-2">AI Code Generator</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed">Describe what to build and let AI generate complete HTML, CSS & JavaScript. Context-aware debugging reads your console output.</p>
                     </div>
 
-                    <!-- Card 3: Live Preview -->
+                    <!-- Card 3: AI Code Review -->
                     <div class="feature-card">
-                        <div class="feature-icon bg-yellow-500/15">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-500" fill="none"
+                        <div class="feature-icon bg-blue-500/15">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
                         </div>
-                        <h3 class="text-slate-900 font-bold text-base mb-2">Live Preview</h3>
-                        <p class="text-slate-600 text-sm leading-relaxed">See your code come alive instantly. Download
-                            as ZIP, pop out to a new window, and share with one click.</p>
+                        <h3 class="text-slate-900 font-bold text-base mb-2">AI Code Review</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed">Get instant feedback on bugs, accessibility, performance, and best practices — like having a senior developer reviewing your code.</p>
+                    </div>
+
+                    <!-- Card 4: Live Cursor Sharing -->
+                    <div class="feature-card">
+                        <div class="feature-icon bg-emerald-500/15">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-500" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+                            </svg>
+                        </div>
+                        <h3 class="text-slate-900 font-bold text-base mb-2">Live Cursor Sharing</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed">See exactly where your teammates are typing with color-coded cursors and floating name labels in every editor pane.</p>
+                    </div>
+
+                    <!-- Card 5: Time-Travel History -->
+                    <div class="feature-card">
+                        <div class="feature-icon bg-purple-500/15">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-500" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-slate-900 font-bold text-base mb-2">Time-Travel History</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed">Browse auto-saved snapshots of your code and restore any previous version with one click. Never lose work again.</p>
+                    </div>
+
+                    <!-- Card 6: Tab-Freeze Protection -->
+                    <div class="feature-card">
+                        <div class="feature-icon bg-red-500/15">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-slate-900 font-bold text-base mb-2">Tab-Freeze Protection</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed">Infinite loops can't crash your browser. A heartbeat monitor kills frozen scripts, and Safe Mode lets you preview without JS.</p>
                     </div>
                 </div>
             </div>
@@ -1678,12 +1719,20 @@
                     <!-- History Panel Overlay -->
                     <div id="history-panel" class="hidden absolute inset-0 bg-gray-900/95 backdrop-blur-sm z-20 flex flex-col">
                         <div class="p-4 border-b border-gray-700 flex items-center justify-between">
-                            <h3 class="text-white font-bold text-sm flex items-center gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                Time-Travel History
-                            </h3>
+                            <div class="flex items-center gap-4">
+                                <h3 class="text-white font-bold text-sm flex items-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    Time-Travel History
+                                </h3>
+                                <button id="save-snapshot-btn" class="bg-gray-800 hover:bg-orange-600 border border-gray-600 hover:border-orange-500 text-white text-xs py-1.5 px-3 rounded text-sm transition-colors flex items-center gap-1.5" title="Force a manual save">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                                    </svg>
+                                    Save
+                                </button>
+                            </div>
                             <button id="history-close-btn" class="text-gray-400 hover:text-white">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -1723,6 +1772,26 @@
                         class="btn-secondary w-full text-white font-semibold py-2.5 px-4 rounded-xl text-sm">Cancel</button>
                     <button id="modal-confirm"
                         class="btn-primary w-full text-white font-semibold py-2.5 px-4 rounded-xl text-sm">Confirm</button>
+                </div>
+            </div>
+            </div>
+        </div>
+
+        <!-- Custom Confirmation Modal -->
+        <div id="confirm-modal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[60]">
+            <div class="glass-modal rounded-2xl p-8 w-full max-w-sm space-y-5 fade-in">
+                <div class="text-center space-y-2">
+                    <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-orange-500/10 mb-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                    </div>
+                    <h2 id="confirm-title" class="text-xl font-bold text-white">Confirm Action</h2>
+                    <p id="confirm-message" class="text-sm text-slate-400">Are you sure you want to proceed?</p>
+                </div>
+                <div class="flex gap-3">
+                    <button id="confirm-cancel-btn" class="btn-secondary w-full text-white font-semibold py-2.5 px-4 rounded-xl text-sm">Cancel</button>
+                    <button id="confirm-ok-btn" class="bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white shadow-[0_0_20px_rgba(249,115,22,0.3)] w-full font-semibold py-2.5 px-4 rounded-xl text-sm transition-all">Proceed</button>
                 </div>
             </div>
         </div>
@@ -1895,6 +1964,11 @@
             nameInput: document.getElementById('name-input'),
             modalConfirm: document.getElementById('modal-confirm'),
             modalCancel: document.getElementById('modal-cancel'),
+            confirmModal: document.getElementById('confirm-modal'),
+            confirmTitle: document.getElementById('confirm-title'),
+            confirmMessage: document.getElementById('confirm-message'),
+            confirmOkBtn: document.getElementById('confirm-ok-btn'),
+            confirmCancelBtn: document.getElementById('confirm-cancel-btn'),
             chatPanel: document.getElementById('chat-panel'),
             chatMessages: document.getElementById('chat-messages'),
             chatForm: document.getElementById('chat-form'),
@@ -1917,6 +1991,7 @@
             historyPanel: document.getElementById('history-panel'),
             historyCloseBtn: document.getElementById('history-close-btn'),
             historyList: document.getElementById('history-list'),
+            saveSnapshotBtn: document.getElementById('save-snapshot-btn'),
             downloadBtn: document.getElementById('download-btn'),
             popoutBtn: document.getElementById('popout-btn'),
             contentWrapper: document.getElementById('content-wrapper')
@@ -2085,6 +2160,31 @@
             }
         }
 
+        // ─── Custom Confirm Dialog Logic ─────────────────────────────────
+        function showConfirmModal(title, message, onConfirm) {
+            dom.confirmTitle.textContent = title;
+            dom.confirmMessage.textContent = message;
+            dom.confirmModal.classList.remove('hidden');
+
+            const handleOk = () => {
+                cleanup();
+                onConfirm();
+            };
+
+            const handleCancel = () => {
+                cleanup();
+            };
+
+            const cleanup = () => {
+                dom.confirmModal.classList.add('hidden');
+                dom.confirmOkBtn.removeEventListener('click', handleOk);
+                dom.confirmCancelBtn.removeEventListener('click', handleCancel);
+            };
+
+            dom.confirmOkBtn.addEventListener('click', handleOk);
+            dom.confirmCancelBtn.addEventListener('click', handleCancel);
+        }
+
         // ─── CodeMirror Editors ───────────────────────────────────────────
         const savedTheme = localStorage.getItem('cc-editor-theme') || 'material-darker';
 
@@ -2180,6 +2280,9 @@
             });
             dom.historyCloseBtn.addEventListener('click', () => {
                 dom.historyPanel.classList.add('hidden');
+            });
+            dom.saveSnapshotBtn.addEventListener('click', () => {
+                socket.emit('save-snapshot-manual', { roomId });
             });
 
             window.addEventListener('message', handleConsoleMessage);
@@ -2433,24 +2536,57 @@
             dom.historyList.innerHTML = '';
             history.slice().reverse().forEach((snap, reverseIdx) => {
                 const realIndex = history.length - 1 - reverseIdx;
+                
+                // Diff logic to see what changed
+                const prevSnap = history[realIndex - 1];
+                let changedFiles = [];
+                if (!prevSnap || snap.html !== prevSnap.html) changedFiles.push('HTML');
+                if (!prevSnap || snap.css !== prevSnap.css) changedFiles.push('CSS');
+                if (!prevSnap || snap.js !== prevSnap.js) changedFiles.push('JS');
+                
+                const changedText = (!prevSnap) ? 'Initial code' : (changedFiles.length ? 'Changed: ' + changedFiles.join(', ') : 'No changes');
+                const badgeHtml = snap.manual ? `<span class="bg-blue-500/20 text-blue-400 text-[9px] px-1.5 py-0.5 rounded font-medium">Manual</span>` : `<span class="bg-gray-700/50 text-gray-400 text-[9px] px-1.5 py-0.5 rounded">Auto</span>`;
+
                 const time = new Date(snap.timestamp);
                 const timeStr = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
                 const item = document.createElement('div');
-                item.className = 'bg-gray-800 border border-gray-700 rounded-lg p-3 hover:border-orange-500/50 transition-colors';
+                item.className = 'bg-gray-800 border border-gray-700 rounded-lg p-3 hover:border-orange-500/50 transition-colors cursor-default';
                 item.innerHTML = `
-                    <div class="flex items-center justify-between mb-1">
-                        <span class="text-orange-400 text-xs font-mono">${timeStr}</span>
-                        <span class="text-gray-400 text-[10px]">${snap.user}</span>
+                    <div class="flex items-center justify-between mb-1.5">
+                        <div class="flex items-center gap-2">
+                            <span class="text-orange-400 text-xs font-mono font-medium">${timeStr}</span>
+                            ${badgeHtml}
+                        </div>
+                        <span class="text-gray-400 text-[10px] flex items-center gap-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                            </svg>
+                            ${snap.user}
+                        </span>
                     </div>
-                    <div class="text-gray-500 text-[10px] mb-2">Snapshot #${realIndex + 1}</div>
-                    <button class="restore-btn w-full text-center bg-orange-500/20 text-orange-400 text-xs py-1.5 rounded-md hover:bg-orange-500/30 transition-colors font-medium">Restore this version</button>
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="text-gray-400 text-[11px] font-medium max-w-[65%] truncate" title="${changedText}">
+                            ${changedText}
+                        </div>
+                        <div class="text-gray-500 text-[10px] font-mono">#${realIndex + 1}</div>
+                    </div>
+                    <button class="restore-btn w-full text-center bg-orange-500/10 border border-orange-500/20 text-orange-400 text-[11px] py-1.5 rounded-md hover:bg-orange-500 hover:text-white transition-all font-semibold flex flex-wrap items-center justify-center gap-1.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
+                        </svg>
+                        Restore
+                    </button>
                 `;
                 item.querySelector('.restore-btn').addEventListener('click', () => {
-                    if (confirm('Restore this snapshot? This will replace the current code for all users.')) {
-                        socket.emit('restore-snapshot', { roomId: currentRoomId, index: realIndex });
-                        dom.historyPanel.classList.add('hidden');
-                    }
+                    showConfirmModal(
+                        'Restore Snapshot',
+                        'Are you sure you want to restore this snapshot? This will replace the current code for all users in the room.',
+                        () => {
+                            socket.emit('restore-snapshot', { roomId: currentRoomId, index: realIndex });
+                            dom.historyPanel.classList.add('hidden');
+                        }
+                    );
                 });
                 dom.historyList.appendChild(item);
             });
