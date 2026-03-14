@@ -599,25 +599,77 @@
             background: white;
             border: 1px solid rgba(148, 163, 184, 0.2);
             border-radius: 16px;
-            padding: 28px 24px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            padding: 32px 24px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border-radius: 16px;
+            padding: 2px;
+            background: linear-gradient(135deg, rgba(249, 115, 22, 0.4) 0%, transparent 50%, rgba(245, 158, 11, 0.4) 100%);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: -1;
         }
 
         .feature-card:hover {
-            border-color: rgba(249, 115, 22, 0.25);
-            transform: translateY(-3px);
-            box-shadow: 0 12px 40px -10px rgba(0, 0, 0, 0.4);
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px -10px rgba(249, 115, 22, 0.15);
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
         }
 
         .feature-icon {
-            width: 44px;
-            height: 44px;
+            width: 48px;
+            height: 48px;
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .feature-card:nth-child(even) .feature-icon {
+            animation-delay: -3s;
+        }
+
+        .feature-card:hover .feature-icon svg {
+            transform: scale(1.15) rotate(5deg);
+        }
+
+        .feature-icon svg {
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* ─── Animations ─── */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         /* ─── Decorative Gradient Bars ─── */
@@ -677,11 +729,10 @@
             display: none;
         }
 
-        /* ─── Bottom Section ─── */
         .features-section {
             background: rgba(255, 255, 255, 0.6);
             border-top: 1px solid rgba(148, 163, 184, 0.15);
-            padding: 60px clamp(24px, 5vw, 80px);
+            padding: 80px clamp(24px, 5vw, 80px); /* Increased padding */
         }
 
         .hero-highlight {
@@ -690,6 +741,25 @@
             color: white;
             font-weight: 900;
             box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Ambient Glow Orbs */
+        .ambient-glow {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            z-index: -1;
+            pointer-events: none;
+        }
+        .orb-orange {
+            width: 400px; height: 400px;
+            background: rgba(249, 115, 22, 0.15);
+            top: -100px; left: -100px;
+        }
+        .orb-blue {
+            width: 350px; height: 350px;
+            background: rgba(59, 130, 246, 0.15);
+            bottom: -50px; right: 10%;
         }
 
         @media (max-width: 768px) {
@@ -1112,17 +1182,17 @@
             </div>
 
             <!-- Feature Cards Section -->
-            <div class="features-section">
-                <div class="text-center mb-12">
-                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-600 text-xs font-semibold uppercase tracking-wider mb-4">
+            <div class="features-section relative z-10">
+                <div class="text-center mb-16 reveal">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-600 text-xs font-semibold uppercase tracking-wider mb-4 animate-pulse">
                         ✨ Everything you need
                     </div>
-                    <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-3">Features that set us apart</h2>
-                    <p class="text-slate-600 max-w-2xl mx-auto text-sm">From AI-powered coding to time-travel debugging — every tool you need for modern collaborative development, built right in.</p>
+                    <h2 class="text-3xl md:text-5xl font-extrabold text-slate-900 mb-4 tracking-tight">Features that set us apart</h2>
+                    <p class="text-slate-600 max-w-2xl mx-auto text-[15px] leading-relaxed">From AI-powered coding to time-travel debugging — every tool you need for modern collaborative development, built right in.</p>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 max-w-5xl mx-auto">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
                     <!-- Card 1: Real-time Collab -->
-                    <div class="feature-card">
+                    <div class="feature-card reveal" style="transition-delay: 100ms;">
                         <div class="feature-icon bg-orange-500/15">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-orange-500" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -1135,7 +1205,7 @@
                     </div>
 
                     <!-- Card 2: AI Code Generator -->
-                    <div class="feature-card">
+                    <div class="feature-card reveal" style="transition-delay: 200ms;">
                         <div class="feature-icon bg-amber-500/15">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-500" viewBox="0 0 20 20"
                                 fill="currentColor">
@@ -1148,7 +1218,7 @@
                     </div>
 
                     <!-- Card 3: AI Code Review -->
-                    <div class="feature-card">
+                    <div class="feature-card reveal" style="transition-delay: 300ms;">
                         <div class="feature-icon bg-blue-500/15">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -1161,7 +1231,7 @@
                     </div>
 
                     <!-- Card 4: Live Cursor Sharing -->
-                    <div class="feature-card">
+                    <div class="feature-card reveal" style="transition-delay: 400ms;">
                         <div class="feature-icon bg-emerald-500/15">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-500" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -1174,7 +1244,7 @@
                     </div>
 
                     <!-- Card 5: Time-Travel History -->
-                    <div class="feature-card">
+                    <div class="feature-card reveal" style="transition-delay: 500ms;">
                         <div class="feature-icon bg-purple-500/15">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-500" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -1187,7 +1257,7 @@
                     </div>
 
                     <!-- Card 6: Tab-Freeze Protection -->
-                    <div class="feature-card">
+                    <div class="feature-card reveal" style="transition-delay: 600ms;">
                         <div class="feature-icon bg-red-500/15">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -2852,6 +2922,28 @@
 
         // ─── Start the App ───────────────────────────────────────────────
         initializeApp();
+
+        // ─── Scroll Reveal Animations ────────────────────────────────────
+        document.addEventListener('DOMContentLoaded', () => {
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.15
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.reveal').forEach(el => {
+                observer.observe(el);
+            });
+        });
     </script>
 
 
