@@ -227,6 +227,7 @@
             z-index: 10;
             pointer-events: none;
         }
+
         .remote-cursor-label {
             position: absolute;
             top: -18px;
@@ -609,7 +610,10 @@
         .feature-card::before {
             content: '';
             position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
             border-radius: 16px;
             padding: 2px;
             background: linear-gradient(135deg, rgba(249, 115, 22, 0.4) 0%, transparent 50%, rgba(245, 158, 11, 0.4) 100%);
@@ -656,9 +660,17 @@
 
         /* ─── Animations ─── */
         @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-8px); }
-            100% { transform: translateY(0px); }
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-8px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
         }
 
         .reveal {
@@ -732,7 +744,8 @@
         .features-section {
             background: rgba(255, 255, 255, 0.6);
             border-top: 1px solid rgba(148, 163, 184, 0.15);
-            padding: 80px clamp(24px, 5vw, 80px); /* Increased padding */
+            padding: 80px clamp(24px, 5vw, 80px);
+            /* Increased padding */
         }
 
         .hero-highlight {
@@ -751,15 +764,21 @@
             z-index: -1;
             pointer-events: none;
         }
+
         .orb-orange {
-            width: 400px; height: 400px;
+            width: 400px;
+            height: 400px;
             background: rgba(249, 115, 22, 0.15);
-            top: -100px; left: -100px;
+            top: -100px;
+            left: -100px;
         }
+
         .orb-blue {
-            width: 350px; height: 350px;
+            width: 350px;
+            height: 350px;
             background: rgba(59, 130, 246, 0.15);
-            bottom: -50px; right: 10%;
+            bottom: -50px;
+            right: 10%;
         }
 
         @media (max-width: 768px) {
@@ -1180,421 +1199,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Feature Cards Section -->
-            <div class="features-section relative z-10">
-                <div class="text-center mb-16 reveal">
-                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-600 text-xs font-semibold uppercase tracking-wider mb-4 animate-pulse">
-                        ✨ Everything you need
-                    </div>
-                    <h2 class="text-3xl md:text-5xl font-extrabold text-slate-900 mb-4 tracking-tight">Features that set us apart</h2>
-                    <p class="text-slate-600 max-w-2xl mx-auto text-[15px] leading-relaxed">From AI-powered coding to time-travel debugging — every tool you need for modern collaborative development, built right in.</p>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-                    <!-- Card 1: Real-time Collab -->
-                    <div class="feature-card reveal" style="transition-delay: 100ms;">
-                        <div class="feature-icon bg-orange-500/15">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-orange-500" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                        </div>
-                        <h3 class="text-slate-900 font-bold text-base mb-2">Real-time Collaboration</h3>
-                        <p class="text-slate-600 text-sm leading-relaxed">Code together in real-time with your team. See live changes, chat inline, and build features simultaneously — no setup required.</p>
-                    </div>
-
-                    <!-- Card 2: AI Code Generator -->
-                    <div class="feature-card reveal" style="transition-delay: 200ms;">
-                        <div class="feature-icon bg-amber-500/15">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-500" viewBox="0 0 20 20"
-                                fill="currentColor">
-                                <path
-                                    d="M10 2a1 1 0 011 1v1.323l3.954 1.582 1.599-.8a1 1 0 01.894 1.79l-1.233.616 1.738 5.42a1 1 0 01-.285 1.05A3.989 3.989 0 0114 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.715-5.349L10 6.477l-2.763 1.105 1.715 5.349a1 1 0 01-.285 1.05A3.989 3.989 0 016 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.738-5.42-1.233-.617a1 1 0 01.894-1.789l1.599.799L10 4.323V3a1 1 0 011-1z" />
-                            </svg>
-                        </div>
-                        <h3 class="text-slate-900 font-bold text-base mb-2">AI Code Generator</h3>
-                        <p class="text-slate-600 text-sm leading-relaxed">Describe what to build and let AI generate complete HTML, CSS & JavaScript. Context-aware debugging reads your console output.</p>
-                    </div>
-
-                    <!-- Card 3: AI Code Review -->
-                    <div class="feature-card reveal" style="transition-delay: 300ms;">
-                        <div class="feature-icon bg-blue-500/15">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
-                        </div>
-                        <h3 class="text-slate-900 font-bold text-base mb-2">AI Code Review</h3>
-                        <p class="text-slate-600 text-sm leading-relaxed">Get instant feedback on bugs, accessibility, performance, and best practices — like having a senior developer reviewing your code.</p>
-                    </div>
-
-                    <!-- Card 4: Live Cursor Sharing -->
-                    <div class="feature-card reveal" style="transition-delay: 400ms;">
-                        <div class="feature-icon bg-emerald-500/15">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-500" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
-                            </svg>
-                        </div>
-                        <h3 class="text-slate-900 font-bold text-base mb-2">Live Cursor Sharing</h3>
-                        <p class="text-slate-600 text-sm leading-relaxed">See exactly where your teammates are typing with color-coded cursors and floating name labels in every editor pane.</p>
-                    </div>
-
-                    <!-- Card 5: Time-Travel History -->
-                    <div class="feature-card reveal" style="transition-delay: 500ms;">
-                        <div class="feature-icon bg-purple-500/15">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-500" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                        </div>
-                        <h3 class="text-slate-900 font-bold text-base mb-2">Time-Travel History</h3>
-                        <p class="text-slate-600 text-sm leading-relaxed">Browse auto-saved snapshots of your code and restore any previous version with one click. Never lose work again.</p>
-                    </div>
-
-                    <!-- Card 6: Tab-Freeze Protection -->
-                    <div class="feature-card reveal" style="transition-delay: 600ms;">
-                        <div class="feature-icon bg-red-500/15">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                            </svg>
-                        </div>
-                        <h3 class="text-slate-900 font-bold text-base mb-2">Tab-Freeze Protection</h3>
-                        <p class="text-slate-600 text-sm leading-relaxed">Infinite loops can't crash your browser. A heartbeat monitor kills frozen scripts, and Safe Mode lets you preview without JS.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tech Stack Banner -->
-            <div class="border-t border-b border-slate-200/60 bg-white/40 backdrop-blur-sm">
-                <div class="tech-marquee max-w-6xl mx-auto">
-                    <!-- First set -->
-                    <div class="tech-slide">
-                        <div class="tech-item">
-                            <svg class="w-5 h-5 text-green-600" viewBox="0 0 128 128">
-                                <path fill="currentColor"
-                                    d="M37.36 94.62l26.6 15.19 26.65-15.19V64.07h-9.97v24.62l-16.68 9.5-16.63-9.5v-24.1H37.36v30.03zM64 43.19l17.77-10.15V12.75l-17.77 10.15L46.23 12.75v20.29L64 43.19zM26.29 45.45l26.6 15.2 26.65-15.2-26.65-15.2-26.6 15.2zM9.68 74.2v-28.5L25.34 36.6h10.37L20.06 45.42v19.46l25.14 14.34v11.83L9.68 74.2zm92.93 28.5v-28.5L86.97 83.1h-10.37l15.65-8.82V54.82l-25.14-14.34V28.65l35.52 16.85v28.5l-16.63 9.49h10.6l16.01-9.2z" />
-                            </svg>
-                            Node.js
-                        </div>
-                        <div class="tech-item">
-                            <svg class="w-5 h-5 text-slate-800" viewBox="0 0 24 24">
-                                <path fill="currentColor"
-                                    d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm4.406 14.773c-.569.284-1.25.46-2.02.46-2.583 0-4.145-1.408-4.145-3.882 0-2.43 1.636-3.83 4.22-3.83.676 0 1.25.122 1.705.31l-.433 1.611c-.392-.162-.84-.257-1.34-.257-1.448 0-2.301.69-2.301 2.084 0 1.259.718 2.057 2.126 2.057.65 0 1.15-.122 1.624-.31v1.757zM19.5 12h-1.921v4.622h-1.854V12h-1.91V10.27h5.685V12zM9.548 10.27v1.86h-3.66v.88h3.186v1.745H5.888v.913h3.768v1.898H3.88V10.27h5.668z" />
-                            </svg>
-                            Express
-                        </div>
-                        <div class="tech-item">
-                            <svg class="w-5 h-5 text-white bg-black rounded-full p-[2px]" viewBox="0 0 24 24">
-                                <path fill="currentColor"
-                                    d="M12 22C6.477 22 2 17.522 2 12S6.477 2 12 2s10 4.478 10 10-4.477 10-10 10zm-3.078-4.881l3.351-5.18h.044l1.631 5.18h2.09l-2.73-8.636h-1.996L8 17.119h1.922zM12 5.093l-4 7.025h2.467L12 9.205l1.533 2.913H16l-4-7.025z" />
-                            </svg>
-                            Socket.IO
-                        </div>
-                        <div class="tech-item">
-                            <svg class="w-5 h-5 text-sky-400" viewBox="0 0 24 24">
-                                <path fill="currentColor"
-                                    d="M12.001,4.8c-3.2,0-5.2,1.6-6,4.8c1.2-1.6,2.6-2.2,4.2-1.8c0.913,0.228,1.565,0.89,2.288,1.624C13.666,10.618,15.027,12,18.001,12c3.2,0,5.2-1.6,6-4.8c-1.2,1.6-2.6,2.2-4.2,1.8c-0.913-0.228-1.565-0.89-2.288-1.624C16.337,6.182,14.976,4.8,12.001,4.8z M6.001,12c-3.2,0-5.2,1.6-6,4.8c1.2-1.6,2.6-2.2,4.2-1.8c0.913,0.228,1.565,0.89,2.288,1.624c1.177,1.194,2.538,2.576,5.512,2.576c3.2,0,5.2-1.6,6-4.8c-1.2,1.6-2.6,2.2-4.2,1.8c-0.913-0.228-1.565-0.89-2.288-1.624C10.337,13.382,8.976,12,6.001,12z" />
-                            </svg>
-                            TailwindCSS
-                        </div>
-                        <div class="tech-item">
-                            <span class="text-lg">🤗</span>
-                            Hugging Face AI
-                        </div>
-                        <div class="tech-item">
-                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none">
-                                <path d="M2.08 1.9h20.106v20.106H2.08V1.9z" fill="#000" />
-                                <path
-                                    d="M21.571 5.952h-4.322v14.488H8.84V9.617C8.84 7.554 10.428 5.8 12.44 5.617a3.444 3.444 0 013.719 3.407v2.368h4.321V8.6a8.032 8.032 0 00-6.906-7.81c-4.275-.544-7.859 2.766-7.859 6.837v12.813H1.428V1H22.18v4.952h-.609z"
-                                    fill="#fff" />
-                            </svg>
-                            CodeMirror
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- How It Works Section -->
-            <div class="py-24 bg-white">
-                <div class="max-w-5xl mx-auto px-6">
-                    <div class="text-center mb-16">
-                        <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">How It Works</h2>
-                        <p class="text-slate-600 max-w-2xl mx-auto">Get from idea to live code in four simple steps. No
-                            friction, no setup.</p>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-                        <!-- Step 1 -->
-                        <div class="flex flex-col items-center text-center relative">
-                            <div
-                                class="w-16 h-16 rounded-2xl bg-orange-100 flex items-center justify-center mb-6 relative z-10 border-2 border-orange-500 shadow-[0_0_20px_rgba(249,115,22,0.2)]">
-                                <span class="text-xl font-bold text-orange-600">1</span>
-                            </div>
-                            <div
-                                class="hidden md:block absolute top-8 left-[60%] w-[80%] h-[2px] bg-slate-200 border-t-2 border-dashed border-slate-300">
-                            </div>
-                            <h3 class="text-lg font-bold text-slate-900 mb-2">Create a Room</h3>
-                            <p class="text-sm text-slate-600">Click a button to instantly spawn a secure workspace. No
-                                accounts required.</p>
-                        </div>
-
-                        <!-- Step 2 -->
-                        <div class="flex flex-col items-center text-center relative">
-                            <div
-                                class="w-16 h-16 rounded-2xl bg-amber-100 flex items-center justify-center mb-6 relative z-10 border-2 border-amber-500 shadow-[0_0_20px_rgba(245,158,11,0.2)]">
-                                <span class="text-xl font-bold text-amber-600">2</span>
-                            </div>
-                            <div
-                                class="hidden md:block absolute top-8 left-[60%] w-[80%] h-[2px] bg-slate-200 border-t-2 border-dashed border-slate-300">
-                            </div>
-                            <h3 class="text-lg font-bold text-slate-900 mb-2">Share the Link</h3>
-                            <p class="text-sm text-slate-600">Send the Room ID to friends or colleagues. They jump right
-                                in alongside you.</p>
-                        </div>
-
-                        <!-- Step 3 -->
-                        <div class="flex flex-col items-center text-center relative">
-                            <div
-                                class="w-16 h-16 rounded-2xl bg-sky-100 flex items-center justify-center mb-6 relative z-10 border-2 border-sky-500 shadow-[0_0_20px_rgba(14,165,233,0.2)]">
-                                <span class="text-xl font-bold text-sky-600">3</span>
-                            </div>
-                            <div
-                                class="hidden md:block absolute top-8 left-[60%] w-[80%] h-[2px] bg-slate-200 border-t-2 border-dashed border-slate-300">
-                            </div>
-                            <h3 class="text-lg font-bold text-slate-900 mb-2">Code & Chat</h3>
-                            <p class="text-sm text-slate-600">Watch cursors fly in real-time. Use the AI Assistant to
-                                generate code instantly.</p>
-                        </div>
-
-                        <!-- Step 4 -->
-                        <div class="flex flex-col items-center text-center relative">
-                            <div
-                                class="w-16 h-16 rounded-2xl bg-emerald-100 flex items-center justify-center mb-6 relative z-10 border-2 border-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.2)]">
-                                <span class="text-xl font-bold text-emerald-600">4</span>
-                            </div>
-                            <h3 class="text-lg font-bold text-slate-900 mb-2">Export Project</h3>
-                            <p class="text-sm text-slate-600">Download the entire repository as a ZIP file or open the
-                                live preview in a new window.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Use Cases Section -->
-            <div class="py-24 bg-slate-50/50 border-t border-slate-200/60">
-                <div class="max-w-5xl mx-auto px-6">
-                    <div class="text-center mb-16">
-                        <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">Who is Code Collab for?</h2>
-                        <p class="text-slate-600 max-w-2xl mx-auto">Built for speed, simplicity, and collaboration. No
-                            matter your goal, we've got you covered.</p>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <!-- Use Case 1 -->
-                        <div
-                            class="bg-white rounded-2xl p-8 border border-slate-200/60 shadow-sm hover:shadow-md transition-shadow">
-                            <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mb-6">
-                                <span class="text-2xl">🎓</span>
-                            </div>
-                            <h3 class="text-xl font-bold text-slate-900 mb-3">Students & Teachers</h3>
-                            <p class="text-slate-600">Perfect for virtual classrooms. Teachers can share a link, and
-                                students can join instantly to learn web development together in real-time.</p>
-                        </div>
-
-                        <!-- Use Case 2 -->
-                        <div
-                            class="bg-white rounded-2xl p-8 border border-slate-200/60 shadow-sm hover:shadow-md transition-shadow">
-                            <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-6">
-                                <span class="text-2xl">💼</span>
-                            </div>
-                            <h3 class="text-xl font-bold text-slate-900 mb-3">Technical Interviews</h3>
-                            <p class="text-slate-600">Conduct seamless front-end interviews without asking candidates to
-                                sign up or install software. Just share a room ID and start coding.</p>
-                        </div>
-
-                        <!-- Use Case 3 -->
-                        <div
-                            class="bg-white rounded-2xl p-8 border border-slate-200/60 shadow-sm hover:shadow-md transition-shadow">
-                            <div class="w-12 h-12 bg-pink-100 rounded-xl flex items-center justify-center mb-6">
-                                <span class="text-2xl">🚀</span>
-                            </div>
-                            <h3 class="text-xl font-bold text-slate-900 mb-3">Rapid Prototyping</h3>
-                            <p class="text-slate-600">Got an idea? Spin up a room, use AI to wireframe the UI instantly,
-                                tweak the code, and export the ZIP straight to your local environment.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Testimonials Section -->
-            <div class="py-24 bg-white border-t border-slate-200/60">
-                <div class="max-w-6xl mx-auto px-6">
-                    <div class="text-center mb-16">
-                        <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">Loved by Developers</h2>
-                        <p class="text-slate-600 max-w-2xl mx-auto">See how teams are using Code Collab to build better
-                            software, faster.</p>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <!-- Testimonial 1 -->
-                        <div class="bg-slate-50 rounded-2xl p-8 border border-slate-200">
-                            <div class="flex gap-1 mb-4 text-amber-500">
-                                <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
-                            </div>
-                            <p class="text-slate-700 font-medium mb-6 leading-relaxed">"The AI assistant is basically
-                                cheating. It generated a complete responsive nav bar for me in seconds. Being able to
-                                see my teammate edit the CSS right next to me is magical."</p>
-                            <div class="flex items-center gap-3">
-                                <div
-                                    class="w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-amber-500 flex items-center justify-center text-white font-bold text-sm">
-                                    S</div>
-                                <div>
-                                    <div class="text-sm font-bold text-slate-900">Sarah Jenkins</div>
-                                    <div class="text-xs text-slate-500">Frontend Engineer @ TechFlow</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Testimonial 2 -->
-                        <div class="bg-slate-50 rounded-2xl p-8 border border-slate-200 mt-0 md:mt-8">
-                            <div class="flex gap-1 mb-4 text-amber-500">
-                                <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
-                            </div>
-                            <p class="text-slate-700 font-medium mb-6 leading-relaxed">"I use this for all my technical
-                                screening interviews now. No login walls, zero latency, and the live preview is
-                                flawless. It saves us hours of setup time."</p>
-                            <div class="flex items-center gap-3">
-                                <div
-                                    class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-cyan-500 flex items-center justify-center text-white font-bold text-sm">
-                                    M</div>
-                                <div>
-                                    <div class="text-sm font-bold text-slate-900">Marcus Chen</div>
-                                    <div class="text-xs text-slate-500">Engineering Manager</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Testimonial 3 -->
-                        <div class="bg-slate-50 rounded-2xl p-8 border border-slate-200 mt-0 md:mt-16">
-                            <div class="flex gap-1 mb-4 text-amber-500">
-                                <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
-                            </div>
-                            <p class="text-slate-700 font-medium mb-6 leading-relaxed">"The fact that I can build a
-                                quick prototype, have AI help debug my console errors, and then just download the ZIP to
-                                continue in VS Code is absolutely incredible."</p>
-                            <div class="flex items-center gap-3">
-                                <div
-                                    class="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white font-bold text-sm">
-                                    E</div>
-                                <div>
-                                    <div class="text-sm font-bold text-slate-900">Elena Rodriguez</div>
-                                    <div class="text-xs text-slate-500">Indie Hacker</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- FAQ Section -->
-            <div class="py-24 bg-slate-50/50 border-t border-slate-200/60">
-                <div class="max-w-3xl mx-auto px-6">
-                    <div class="text-center mb-16">
-                        <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">Frequently Asked
-                            Questions</h2>
-                        <p class="text-slate-600">Everything you need to know about Code Collab.</p>
-                    </div>
-
-                    <div class="space-y-4">
-                        <!-- FAQ Item 1 -->
-                        <details class="group bg-white rounded-xl border border-slate-200/60 overflow-hidden">
-                            <summary
-                                class="flex items-center justify-between p-6 cursor-pointer text-slate-900 font-bold select-none">
-                                <span>Do I need to create an account?</span>
-                                <span class="transition group-open:rotate-180 text-orange-500">
-                                    <svg fill="none" height="24" shape-rendering="geometricPrecision"
-                                        stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                        stroke-width="1.5" viewBox="0 0 24 24" width="24">
-                                        <path d="M6 9l6 6 6-6"></path>
-                                    </svg>
-                                </span>
-                            </summary>
-                            <div class="px-6 pb-6 text-slate-600 leading-relaxed">
-                                No! Code Collab is designed to be completely frictionless. You can spin up a new
-                                room, invite friends, and start coding within seconds without ever entering an email
-                                or password.
-                            </div>
-                        </details>
-
-                        <!-- FAQ Item 2 -->
-                        <details class="group bg-white rounded-xl border border-slate-200/60 overflow-hidden">
-                            <summary
-                                class="flex items-center justify-between p-6 cursor-pointer text-slate-900 font-bold select-none">
-                                <span>Are my rooms and code private?</span>
-                                <span class="transition group-open:rotate-180 text-orange-500">
-                                    <svg fill="none" height="24" shape-rendering="geometricPrecision"
-                                        stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                        stroke-width="1.5" viewBox="0 0 24 24" width="24">
-                                        <path d="M6 9l6 6 6-6"></path>
-                                    </svg>
-                                </span>
-                            </summary>
-                            <div class="px-6 pb-6 text-slate-600 leading-relaxed">
-                                Rooms are only accessible to people who have the exact Room ID (the URL link). While
-                                not deeply encrypted, they are practically private as long as you keep your link
-                                secure amongst your team.
-                            </div>
-                        </details>
-
-                        <!-- FAQ Item 3 -->
-                        <details class="group bg-white rounded-xl border border-slate-200/60 overflow-hidden">
-                            <summary
-                                class="flex items-center justify-between p-6 cursor-pointer text-slate-900 font-bold select-none">
-                                <span>What languages does the AI understand?</span>
-                                <span class="transition group-open:rotate-180 text-orange-500">
-                                    <svg fill="none" height="24" shape-rendering="geometricPrecision"
-                                        stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                        stroke-width="1.5" viewBox="0 0 24 24" width="24">
-                                        <path d="M6 9l6 6 6-6"></path>
-                                    </svg>
-                                </span>
-                            </summary>
-                            <div class="px-6 pb-6 text-slate-600 leading-relaxed">
-                                The embedded Code Collab AI is currently optimized to generate, refactor, and debug
-                                Front-end technologies: HTML, vanilla CSS, and JavaScript.
-                            </div>
-                        </details>
-
-                        <!-- FAQ Item 4 -->
-                        <details class="group bg-white rounded-xl border border-slate-200/60 overflow-hidden">
-                            <summary
-                                class="flex items-center justify-between p-6 cursor-pointer text-slate-900 font-bold select-none">
-                                <span>How do I save my project?</span>
-                                <span class="transition group-open:rotate-180 text-orange-500">
-                                    <svg fill="none" height="24" shape-rendering="geometricPrecision"
-                                        stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                        stroke-width="1.5" viewBox="0 0 24 24" width="24">
-                                        <path d="M6 9l6 6 6-6"></path>
-                                    </svg>
-                                </span>
-                            </summary>
-                            <div class="px-6 pb-6 text-slate-600 leading-relaxed">
-                                Once you enter the editor, there is a prominent "Download as ZIP" button hovering in
-                                the bottom right corner of the preview area. Clicking this instantly bundles your
-                                HTML, CSS, and JS into a ready-to-use directory on your local machine.
-                            </div>
-                        </details>
-                    </div>
-                </div>
-            </div>
-
             <!-- Footer -->
             <footer class="bg-slate-950 pt-16 pb-8 border-t border-slate-800">
                 <div class="max-w-6xl mx-auto px-6">
@@ -1671,7 +1275,6 @@
                     </div>
                 </div>
             </footer>
-
         </div>
 
         <!-- Editor View -->
@@ -1758,8 +1361,10 @@
                     <div class="absolute bottom-4 right-4 flex gap-2">
                         <button id="history-btn" title="Time-Travel History"
                             class="bg-gray-700 text-white hover:bg-orange-600 rounded-full p-3 shadow-lg transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </button>
                         <button id="safe-mode-btn" title="Toggle Safe Mode (disable JS)"
@@ -1787,30 +1392,39 @@
                     </div>
 
                     <!-- History Panel Overlay -->
-                    <div id="history-panel" class="hidden absolute inset-0 bg-gray-900/95 backdrop-blur-sm z-20 flex flex-col">
+                    <div id="history-panel"
+                        class="hidden absolute inset-0 bg-gray-900/95 backdrop-blur-sm z-20 flex flex-col">
                         <div class="p-4 border-b border-gray-700 flex items-center justify-between">
                             <div class="flex items-center gap-4">
                                 <h3 class="text-white font-bold text-sm flex items-center gap-2">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-orange-400" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
                                     Time-Travel History
                                 </h3>
-                                <button id="save-snapshot-btn" class="bg-gray-800 hover:bg-orange-600 border border-gray-600 hover:border-orange-500 text-white text-xs py-1.5 px-3 rounded text-sm transition-colors flex items-center gap-1.5" title="Force a manual save">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                                <button id="save-snapshot-btn"
+                                    class="bg-gray-800 hover:bg-orange-600 border border-gray-600 hover:border-orange-500 text-white text-xs py-1.5 px-3 rounded text-sm transition-colors flex items-center gap-1.5"
+                                    title="Force a manual save">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
                                     </svg>
                                     Save
                                 </button>
                             </div>
                             <button id="history-close-btn" class="text-gray-400 hover:text-white">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                                 </svg>
                             </button>
                         </div>
                         <div id="history-list" class="flex-1 overflow-y-auto p-4 space-y-2">
-                            <p class="text-gray-500 text-sm text-center">No snapshots yet. Start editing to create history.</p>
+                            <p class="text-gray-500 text-sm text-center">No snapshots yet. Start editing to create
+                                history.</p>
                         </div>
                     </div>
                 </div>
@@ -1844,27 +1458,32 @@
                         class="btn-primary w-full text-white font-semibold py-2.5 px-4 rounded-xl text-sm">Confirm</button>
                 </div>
             </div>
-            </div>
         </div>
+    </div>
 
-        <!-- Custom Confirmation Modal -->
-        <div id="confirm-modal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[60]">
-            <div class="glass-modal rounded-2xl p-8 w-full max-w-sm space-y-5 fade-in">
-                <div class="text-center space-y-2">
-                    <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-orange-500/10 mb-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                        </svg>
-                    </div>
-                    <h2 id="confirm-title" class="text-xl font-bold text-white">Confirm Action</h2>
-                    <p id="confirm-message" class="text-sm text-slate-400">Are you sure you want to proceed?</p>
+    <!-- Custom Confirmation Modal -->
+    <div id="confirm-modal"
+        class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[60]">
+        <div class="glass-modal rounded-2xl p-8 w-full max-w-sm space-y-5 fade-in">
+            <div class="text-center space-y-2">
+                <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-orange-500/10 mb-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-orange-500" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
                 </div>
-                <div class="flex gap-3">
-                    <button id="confirm-cancel-btn" class="btn-secondary w-full text-white font-semibold py-2.5 px-4 rounded-xl text-sm">Cancel</button>
-                    <button id="confirm-ok-btn" class="bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white shadow-[0_0_20px_rgba(249,115,22,0.3)] w-full font-semibold py-2.5 px-4 rounded-xl text-sm transition-all">Proceed</button>
-                </div>
+                <h2 id="confirm-title" class="text-xl font-bold text-white">Confirm Action</h2>
+                <p id="confirm-message" class="text-sm text-slate-400">Are you sure you want to proceed?</p>
+            </div>
+            <div class="flex gap-3">
+                <button id="confirm-cancel-btn"
+                    class="btn-secondary w-full text-white font-semibold py-2.5 px-4 rounded-xl text-sm">Cancel</button>
+                <button id="confirm-ok-btn"
+                    class="bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white shadow-[0_0_20px_rgba(249,115,22,0.3)] w-full font-semibold py-2.5 px-4 rounded-xl text-sm transition-all">Proceed</button>
             </div>
         </div>
+    </div>
     </div>
 
 
@@ -1980,16 +1599,21 @@
             </div>
             <div class="flex gap-2">
                 <button type="submit" id="ai-submit-btn"
-                    class="flex-1 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400 text-white py-2 px-3 rounded-lg shadow-lg shadow-orange-500/20 transition-all hover:scale-[1.02] text-xs font-semibold flex items-center justify-center gap-1.5" title="Generate Code">
+                    class="flex-1 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400 text-white py-2 px-3 rounded-lg shadow-lg shadow-orange-500/20 transition-all hover:scale-[1.02] text-xs font-semibold flex items-center justify-center gap-1.5"
+                    title="Generate Code">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.428A1 1 0 009.894 15V4.106A1 1 0 0010.894 2.553z" />
+                        <path
+                            d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.428A1 1 0 009.894 15V4.106A1 1 0 0010.894 2.553z" />
                     </svg>
                     Generate
                 </button>
                 <button type="button" id="ai-review-btn"
-                    class="flex-1 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-400 hover:to-cyan-400 text-white py-2 px-3 rounded-lg shadow-lg shadow-blue-500/20 transition-all hover:scale-[1.02] text-xs font-semibold flex items-center justify-center gap-1.5" title="Review Code">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    class="flex-1 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-400 hover:to-cyan-400 text-white py-2 px-3 rounded-lg shadow-lg shadow-blue-500/20 transition-all hover:scale-[1.02] text-xs font-semibold flex items-center justify-center gap-1.5"
+                    title="Review Code">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                     Review
                 </button>
@@ -2416,7 +2040,7 @@
         // ─── Remote Cursor Rendering ─────────────────────────────────────
         const remoteCursors = {}; // { uid: { bookmark, lang } }
 
-        const CURSOR_COLORS = ['#f97316','#3b82f6','#22c55e','#a855f7','#ec4899','#14b8a6','#eab308','#ef4444'];
+        const CURSOR_COLORS = ['#f97316', '#3b82f6', '#22c55e', '#a855f7', '#ec4899', '#14b8a6', '#eab308', '#ef4444'];
         function getCursorColor(uid) {
             let hash = 0;
             for (let i = 0; i < uid.length; i++) hash = uid.charCodeAt(i) + ((hash << 5) - hash);
@@ -2606,14 +2230,14 @@
             dom.historyList.innerHTML = '';
             history.slice().reverse().forEach((snap, reverseIdx) => {
                 const realIndex = history.length - 1 - reverseIdx;
-                
+
                 // Diff logic to see what changed
                 const prevSnap = history[realIndex - 1];
                 let changedFiles = [];
                 if (!prevSnap || snap.html !== prevSnap.html) changedFiles.push('HTML');
                 if (!prevSnap || snap.css !== prevSnap.css) changedFiles.push('CSS');
                 if (!prevSnap || snap.js !== prevSnap.js) changedFiles.push('JS');
-                
+
                 const changedText = (!prevSnap) ? 'Initial code' : (changedFiles.length ? 'Changed: ' + changedFiles.join(', ') : 'No changes');
                 const badgeHtml = snap.manual ? `<span class="bg-blue-500/20 text-blue-400 text-[9px] px-1.5 py-0.5 rounded font-medium">Manual</span>` : `<span class="bg-gray-700/50 text-gray-400 text-[9px] px-1.5 py-0.5 rounded">Auto</span>`;
 
