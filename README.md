@@ -1,6 +1,6 @@
-# Code Collab
+# Code Collab (Codependal)
 
-Code Collab is a fast, frictionless, real-time collaborative web IDE. It allows multiple developers to jump into a shared room and write HTML, CSS, and JavaScript together, with changes instantly reflected in a live preview.
+Code Collab (Codependal) is a fast, frictionless, real-time collaborative web IDE. It allows multiple developers to jump into a shared room and write HTML, CSS, and JavaScript together, with changes instantly reflected in a live preview.
 
 Designed for speed and simplicity, Code Collab requires no sign-ups or installations. It also features a built-in AI Assistant powered by Hugging Face to help you generate, debug, and refactor code on the fly.
 
