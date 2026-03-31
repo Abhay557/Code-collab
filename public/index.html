@@ -4,14 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Code Collab - Real-time Collaborative IDE</title>
+    <title>Codependal - Real-time Collaborative IDE</title>
 
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="manifest" href="/site.webmanifest">
 
-    <meta property="og:title" content="Code Collab - Real-time Collaborative Editor">
+    <meta property="og:title" content="Codependal - Real-time Collaborative Editor">
     <meta property="og:description"
         content="A free, in-browser tool for pair programming and live code sharing. No sign-up required.">
     <meta property="og:image"
@@ -28,6 +28,26 @@
         rel="stylesheet">
 
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Codependal",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Web",
+  "description": "A real-time collaborative web IDE featuring Socket.IO synchronization and a built-in Hugging Face AI assistant for code generation.",
+  "url": "https://codependal.com/",
+  "author": {
+    "@type": "Person",
+    "name": "Abhay Mourya",
+    "url": "https://abhaymourya.com/"
+  }
+}
+  </script>
+
+
+
     <script>
         tailwind.config = {
             theme: {
@@ -853,6 +873,7 @@
             color: white;
             transition: transform 0.3s;
         }
+
     </style>
 </head>
 
@@ -871,8 +892,8 @@
             <!-- Top Navigation Bar -->
             <nav class="home-nav px-6 py-3 flex items-center justify-between">
                 <div class="flex items-center gap-2">
-                    <img src="/codelogo.png" alt="Code Collab Logo" class="w-8 h-8 rounded-lg shadow-sm" />
-                    <span class="font-bold text-white text-sm">Code Collab</span>
+                    <img src="/codelogo.png" alt="Codependal Logo" class="w-8 h-8 rounded-lg shadow-sm" />
+                    <span class="font-bold text-slate-900 text-sm">Codependal</span>
                 </div>
                 <div class="flex items-center gap-1">
                     <a href="https://github.com/Abhay557/Code-Collab" target="_blank" rel="noopener noreferrer"
@@ -902,51 +923,47 @@
             <div class="hero-section fade-in">
                 <!-- Left: Headline + Actions -->
                 <div class="hero-left">
-                    <h1 class="text-4xl md:text-5xl font-extrabold leading-tight tracking-tight mb-5">
-                        <h1
-                            class="text-5xl md:text-6xl font-extrabold leading-tight tracking-tight mb-6 text-slate-900">
-                            Learn to
-                            <span class="hero-highlight bg-amber-400 transform -rotate-1 text-slate-900">code</span>
-                            your dreams and
-                            <span class="hero-highlight bg-blue-500 transform rotate-1">design</span>
-                            your future
-                        </h1>
-                        <p class="text-slate-600 text-base leading-relaxed mb-8 max-w-md">
-                            Code Collab is a <strong class="text-slate-800">real-time collaborative IDE</strong> for
-                            front-end developers.
-                            Build together, preview instantly, and get <strong
-                                class="text-slate-800">AI-powered</strong>
-                            code assistance — no sign-up required.
-                        </p>
+                    <h1 class="text-5xl md:text-6xl font-extrabold leading-tight tracking-tight mb-6 text-slate-900">
+                        Learn to
+                        <span class="hero-highlight bg-amber-400 transform -rotate-1 text-slate-900">code</span>
+                        your dreams and
+                        <span class="hero-highlight bg-blue-500 transform rotate-1">design</span>
+                        your future
+                    </h1>
+                    <p class="text-slate-600 text-base leading-relaxed mb-8 max-w-md">
+                        Codependal is a <strong class="text-slate-800">real-time collaborative IDE</strong> for
+                        front-end developers.
+                        Build together, preview instantly, and get <strong class="text-slate-800">AI-powered</strong>
+                        code assistance — no sign-up required.
+                    </p>
 
-                        <div class="flex flex-wrap items-center gap-3 mb-8">
-                            <button id="create-private-room-btn"
-                                class="btn-primary text-white font-semibold py-3 px-6 rounded-xl text-sm flex items-center gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                </svg>
-                                Create Private Room
-                            </button>
-                            <button id="join-random-btn"
-                                class="p-1 px-2.5 bg-slate-700 hover:bg-orange-600 text-white rounded text-xs transition-colors flex items-center gap-1">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                                    stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="M13 10V3L4 14h7v7l9-11h-7z" />
-                                </svg>
-                                Join Random Room
-                            </button>
-                        </div>
+                    <div class="flex flex-wrap items-center gap-3 mb-8">
+                        <button id="create-private-room-btn"
+                            class="btn-primary text-white font-semibold py-3 px-6 rounded-xl text-sm flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            </svg>
+                            Create Private Room
+                        </button>
+                        <button id="join-random-btn"
+                            class="btn-secondary text-white font-semibold py-3 px-6 rounded-xl text-sm flex items-center gap-2 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                            Join Random Room
+                        </button>
+                    </div>
 
-                        <!-- Join by ID (inline) -->
-                        <div class="flex items-center gap-2 max-w-md">
-                            <input type="text" id="room-id-input" placeholder="Paste Room ID..."
-                                class="input-premium flex-grow text-slate-900 bg-white px-4 py-2.5 rounded-xl text-sm font-mono tracking-wider placeholder-slate-400">
-                            <button id="join-room-btn"
-                                class="btn-secondary text-white font-semibold py-2.5 px-5 rounded-xl text-sm whitespace-nowrap">Join</button>
-                        </div>
+                    <!-- Join by ID (inline) -->
+                    <div class="flex items-center gap-2 max-w-md">
+                        <input type="text" id="room-id-input" placeholder="Paste Room ID..."
+                            class="input-premium flex-grow text-slate-900 bg-white px-4 py-2.5 rounded-xl text-sm font-mono tracking-wider placeholder-slate-400">
+                        <button id="join-room-btn"
+                            class="btn-accent text-white font-semibold py-2.5 px-5 rounded-xl text-sm whitespace-nowrap">Join</button>
+                    </div>
                 </div>
 
                 <!-- Right: Code Editor + AI Mockup -->
@@ -969,7 +986,7 @@
                                     <span class="ml-2">HTML</span>
                                 </div>
                                 <div class="code-mockup-body">
-                                    <span class="cm">&lt;!-- Code Collab --&gt;</span><br>
+                                    <span class="cm">&lt;!-- Codependal --&gt;</span><br>
                                     &lt;<span class="tag">div</span> <span class="attr">class</span>=<span
                                         class="str">"container"</span>&gt;<br>
                                     &nbsp;&nbsp;&lt;<span class="tag">h1</span>&gt;Hello World&lt;/<span
@@ -1088,14 +1105,23 @@
                 </div>
             </div>
 
+
             <!-- AI Feature Showcase -->
-            <div class="py-16 px-6 md:px-20">
-                <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center gap-12">
+            <div class="py-20 px-6 md:px-20 bg-slate-900 relative overflow-hidden">
+                <!-- Ambient glow -->
+                <div
+                    class="absolute top-0 left-1/4 w-96 h-96 bg-orange-500/10 rounded-full filter blur-[120px] pointer-events-none">
+                </div>
+                <div
+                    class="absolute bottom-0 right-1/4 w-80 h-80 bg-amber-500/10 rounded-full filter blur-[100px] pointer-events-none">
+                </div>
+
+                <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center gap-12 relative z-10">
 
                     <!-- Left: Text -->
                     <div class="flex-1 space-y-4">
                         <div
-                            class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-300 text-xs font-semibold uppercase tracking-wider mb-2">
+                            class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-400 text-xs font-semibold uppercase tracking-wider mb-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20"
                                 fill="currentColor">
                                 <path
@@ -1103,27 +1129,27 @@
                             </svg>
                             AI-Powered
                         </div>
-                        <h2 class="text-3xl md:text-4xl font-extrabold leading-tight text-slate-900">
+                        <h2 class="text-3xl md:text-4xl font-extrabold leading-tight text-white">
                             Just describe it.<br>
                             <span class="bg-gradient-to-r from-orange-400 to-amber-400 bg-clip-text text-transparent">AI
                                 writes the code.</span>
                         </h2>
-                        <p class="text-slate-600 text-sm leading-relaxed max-w-md">
-                            Type a prompt, and the AI assistant generates complete <strong class="text-slate-800">HTML,
+                        <p class="text-slate-400 text-sm leading-relaxed max-w-md">
+                            Type a prompt, and the AI assistant generates complete <strong class="text-slate-200">HTML,
                                 CSS & JavaScript</strong>.
                             It reads your existing code and console output for context-aware debugging and code
                             generation.
                         </p>
                         <div class="flex items-center gap-4 pt-2">
-                            <div class="flex items-center gap-2 text-xs text-slate-500">
+                            <div class="flex items-center gap-2 text-xs text-slate-400">
                                 <div class="w-1.5 h-1.5 rounded-full bg-emerald-400"></div>
                                 Context-aware
                             </div>
-                            <div class="flex items-center gap-2 text-xs text-slate-500">
+                            <div class="flex items-center gap-2 text-xs text-slate-400">
                                 <div class="w-1.5 h-1.5 rounded-full bg-emerald-400"></div>
                                 Console debugging
                             </div>
-                            <div class="flex items-center gap-2 text-xs text-slate-500">
+                            <div class="flex items-center gap-2 text-xs text-slate-400">
                                 <div class="w-1.5 h-1.5 rounded-full bg-emerald-400"></div>
                                 Multi-file output
                             </div>
@@ -1132,7 +1158,8 @@
 
                     <!-- Right: AI Chat Mockup -->
                     <div class="flex-1 max-w-md w-full">
-                        <div class="code-mockup">
+                        <div class="code-mockup"
+                            style="box-shadow: 0 25px 60px -12px rgba(0,0,0,0.4), 0 0 40px -10px rgba(249,115,22,0.15);">
                             <div class="code-mockup-tab">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-orange-400"
                                     viewBox="0 0 20 20" fill="currentColor">
@@ -1169,8 +1196,6 @@
                                             class="str">#f59e0b</span>;<br>
                                         &nbsp;&nbsp;<span class="prop">text-shadow</span>: <span class="num">0 0
                                             8px</span> <span class="str">#f59e0b</span>;<br>
-                                        &nbsp;&nbsp;<span class="prop">transition</span>: <span class="kw">all</span>
-                                        <span class="num">0.3s</span>;<br>
                                         }<br><br>
                                         <span class="tag">.neon-btn</span><span class="fn">:hover</span> {<br>
                                         &nbsp;&nbsp;<span class="prop">background</span>: <span
@@ -1184,9 +1209,10 @@
                                 <!-- Fake input -->
                                 <div class="flex gap-2 mt-1">
                                     <div
-                                        class="flex-grow bg-slate-100 border border-slate-200 rounded-lg px-3 py-2 text-slate-500 text-xs">
+                                        class="flex-grow bg-slate-800/60 border border-slate-700/40 rounded-lg px-3 py-2 text-slate-500 text-xs">
                                         Describe what to build...</div>
-                                    <div class="bg-orange-500 rounded-lg p-2 flex items-center justify-center">
+                                    <div
+                                        class="bg-gradient-to-r from-orange-600 to-amber-600 rounded-lg p-2 flex items-center justify-center">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-white"
                                             viewBox="0 0 20 20" fill="currentColor">
                                             <path
@@ -1214,7 +1240,7 @@
                                             clip-rule="evenodd" />
                                     </svg>
                                 </div>
-                                <span class="font-bold text-xl text-white tracking-tight">Code Collab</span>
+                                <span class="font-bold text-xl text-white tracking-tight">Codependal</span>
                             </div>
                             <p class="text-slate-400 max-w-sm mb-6">The fastest way to build web interfaces
                                 together. No signups, no setup, just real-time collaboration with AI superpowers.
@@ -1263,9 +1289,9 @@
 
                     <div
                         class="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-                        <p class="text-slate-500 text-sm">© 2026 Code Collab. All rights reserved.</p>
+                        <p class="text-slate-500 text-sm">© 2026 Codependal. All rights reserved.</p>
                         <div class="flex items-center gap-2 text-sm text-slate-500">
-                            <span>Built with</span>
+                            <span>Abhay Mourya</span>
                             <svg class="w-4 h-4 text-orange-500" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd"
                                     d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
@@ -1284,7 +1310,7 @@
                     <div class="flex items-center gap-2">
                         <img src="/codelogo.png" alt="Code Collab Logo" class="w-7 h-7 rounded-lg shadow-sm" />
                         <h1 class="text-base font-bold text-slate-100">
-                            Code Collab</h1>
+                            Codependal</h1>
                     </div>
                     <span
                         class="font-mono text-xs px-2.5 py-1 rounded-md bg-slate-800/80 border border-slate-700/50 text-slate-400">Room:
@@ -1530,9 +1556,8 @@
                     class="w-full bg-gray-800 border border-gray-700 text-white pl-4 pr-12 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 text-sm shadow-inner placeholder-gray-500">
                 <button type="submit"
                     class="absolute right-2 top-1.5 bg-orange-600 hover:bg-orange-500 text-white p-1.5 rounded-lg shadow-lg transition-all hover:scale-105">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                        <path
-                            d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.428A1 1 0 009.894 15V4.106A1 1 0 0010.894 2.553z" />
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M3.478 2.404a.75.75 0 00-.926.941l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.404z" />
                     </svg>
                 </button>
             </div>
@@ -1546,7 +1571,7 @@
         <div id="ai-header"
             class="bg-gray-900/80 px-5 py-4 flex items-center justify-between border-b border-gray-700/50 rounded-t-2xl select-none">
             <div class="flex items-center gap-3">
-                <img src="/codelogo.png" alt="Code Collab Logo"
+                <img src="/codelogo.png" alt="Codependal Logo"
                     class="w-8 h-8 rounded-lg shadow-lg shadow-orange-500/20" />
                 <div>
                     <h3 class="font-bold text-white text-sm">Code Colab AI</h3>
@@ -1601,9 +1626,8 @@
                 <button type="submit" id="ai-submit-btn"
                     class="flex-1 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400 text-white py-2 px-3 rounded-lg shadow-lg shadow-orange-500/20 transition-all hover:scale-[1.02] text-xs font-semibold flex items-center justify-center gap-1.5"
                     title="Generate Code">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
-                        <path
-                            d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.428A1 1 0 009.894 15V4.106A1 1 0 0010.894 2.553z" />
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor">
+                        <path fill-rule="evenodd" d="M9 4.5a.75.75 0 01.721.544l.813 2.846a3.75 3.75 0 002.576 2.576l2.846.813a.75.75 0 010 1.442l-2.846.813a3.75 3.75 0 00-2.576 2.576l-.813 2.846a.75.75 0 01-1.442 0l-.813-2.846a3.75 3.75 0 00-2.576-2.576l-2.846-.813a.75.75 0 010-1.442l2.846-.813A3.75 3.75 0 007.466 7.89l.813-2.846A.75.75 0 019 4.5zM18 1.5a.75.75 0 01.728.568l.258 1.036c.236.94.97 1.674 1.91 1.91l1.036.258a.75.75 0 010 1.456l-1.036.258c-.94.236-1.674.97-1.91 1.91l-.258 1.036a.75.75 0 01-1.456 0l-.258-1.036a2.625 2.625 0 00-1.91-1.91l-1.036-.258a.75.75 0 010-1.456l1.036-.258a2.625 2.625 0 001.91-1.91l.258-1.036A.75.75 0 0118 1.5zM16.5 15a.75.75 0 01.712.513l.394 1.183c.15.447.5.799.948.948l1.183.395a.75.75 0 010 1.422l-1.183.395c-.447.15-.799.5-.948.948l-.395 1.183a.75.75 0 01-1.422 0l-.395-1.183a1.5 1.5 0 00-.948-.948l-1.183-.395a.75.75 0 010-1.422l1.183-.395c.447-.15.799-.5.948-.948l.395-1.183A.75.75 0 0116.5 15z" clip-rule="evenodd" />
                     </svg>
                     Generate
                 </button>
@@ -2568,6 +2592,8 @@
                 observer.observe(el);
             });
         });
+
+
     </script>
 
 
