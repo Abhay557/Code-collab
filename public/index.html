@@ -213,18 +213,30 @@
             box-shadow: 0 24px 48px rgba(0, 0, 0, 0.6);
         }
 
-        /* â”€â”€â”€ Cursors â”€â”€â”€ */
+        /* ─── Cursors ─── */
         .remote-cursor {
-            position: absolute;
-            width: 2px;
+            position: relative;
+            display: inline-block;
+            width: 0;
+            height: 0;
+            vertical-align: top;
+            pointer-events: none;
             z-index: 10;
+        }
+
+        .remote-cursor-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 2px;
+            height: 1.2em;
             pointer-events: none;
         }
 
         .remote-cursor-label {
             position: absolute;
             top: -18px;
-            left: 0;
+            left: -2px;
             font-size: 10px;
             font-family: 'Inter', sans-serif;
             font-weight: 600;
@@ -235,6 +247,7 @@
             line-height: 14px;
             pointer-events: none;
             opacity: 0.9;
+            transition: opacity 0.3s ease;
         }
 
         /* â”€â”€â”€ Buttons â”€â”€â”€ */
@@ -497,6 +510,50 @@
             height: 1px;
             background: rgba(255, 255, 255, 0.08);
         }
+
+        /* ─── Notification Center ─── */
+        .notif-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            animation: notifSlideIn 0.2s ease-out;
+        }
+
+        .notif-item:last-child {
+            border-bottom: none;
+        }
+
+        .notif-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            margin-top: 4px;
+        }
+
+        .notif-badge, .chat-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ef4444;
+            border: 1.5px solid #000;
+        }
+
+        @keyframes notifSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-4px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
 
@@ -737,7 +794,7 @@
                         AI
                     </button>
                     <button id="toggle-chat-btn" onclick="toggleChat()"
-                        class="flex items-center gap-1.5 bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.08] text-white font-medium py-1.5 px-3 rounded-lg transition-all text-xs">
+                        class="relative flex items-center gap-1.5 bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.08] text-white font-medium py-1.5 px-3 rounded-lg transition-all text-xs">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20"
                             fill="currentColor">
                             <path fill-rule="evenodd"
@@ -745,6 +802,16 @@
                                 clip-rule="evenodd" />
                         </svg>
                         Chat
+                        <span id="chat-badge" class="chat-badge hidden"></span>
+                    </button>
+                    <button id="toggle-notif-btn" onclick="toggleNotifications()"
+                        class="relative flex items-center gap-1.5 bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.08] text-white font-medium py-1.5 px-3 rounded-lg transition-all text-xs">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
+                        </svg>
+                        <span id="notif-badge" class="notif-badge hidden"></span>
                     </button>
                     <button id="leave-room-btn"
                         class="btn-danger font-medium py-1.5 px-3 rounded-lg text-xs">Leave</button>
@@ -1023,6 +1090,43 @@
         </form>
     </div>
 
+    <!-- Notification Center Popup -->
+    <div id="notif-panel" class="ai-popup">
+        <div class="bg-[#111] px-5 py-4 flex items-center justify-between border-b border-white/[0.06] rounded-t-xl select-none">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-white/[0.06] flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-zinc-400" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
+                    </svg>
+                </div>
+                <h3 class="font-semibold text-white text-sm">Notifications</h3>
+            </div>
+            <div class="flex items-center gap-3">
+                <button id="notif-clear-btn" class="text-zinc-500 hover:text-white text-xs transition-colors">Clear All</button>
+                <button onclick="toggleNotifications()" class="text-zinc-500 hover:text-white transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd"
+                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                            clip-rule="evenodd" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <div id="notif-list" class="flex-grow overflow-y-auto scrollbar-hide">
+            <div id="notif-empty" class="flex flex-col items-center justify-center h-full py-16 text-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-zinc-700 mb-3" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
+                </svg>
+                <p class="text-zinc-600 text-sm">No notifications yet</p>
+                <p class="text-zinc-700 text-xs mt-1">Activity will appear here</p>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Global error handler to catch any runtime errors
         window.onerror = function (msg, url, line, col, error) {
@@ -1090,7 +1194,13 @@
             saveSnapshotBtn: document.getElementById('save-snapshot-btn'),
             downloadBtn: document.getElementById('download-btn'),
             popoutBtn: document.getElementById('popout-btn'),
-            contentWrapper: document.getElementById('content-wrapper')
+            contentWrapper: document.getElementById('content-wrapper'),
+            notifPanel: document.getElementById('notif-panel'),
+            notifList: document.getElementById('notif-list'),
+            notifEmpty: document.getElementById('notif-empty'),
+            notifBadge: document.getElementById('notif-badge'),
+            notifClearBtn: document.getElementById('notif-clear-btn'),
+            chatBadge: document.getElementById('chat-badge')
         };
 
         let currentRoomId = null;
@@ -1099,10 +1209,15 @@
         let htmlEditor, cssEditor, jsEditor;
         let isChatOpen = false;
         let isAiOpen = false;
+        let isNotifOpen = false;
         let isRemoteUpdate = false; // flag to prevent echo loops
         let isAiGenerating = false;
         let isSafeModeOn = false;
         let heartbeatTimer = null;
+        let unreadChatCount = 0;
+        let unreadNotifCount = 0;
+        let notifications = [];
+        let activityEditTimers = {}; // debounce map for edit notifications
 
         // â”€â”€â”€ Utility Functions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         function showView(viewName) {
@@ -1330,8 +1445,13 @@
                 if (!isRemoteUpdate) handleCodeChange('js', jsEditor.getValue());
             });
 
-            // Cursor sharing: emit position on cursor activity
+            // Cursor sharing: emit position on cursor activity (throttled)
+            let cursorThrottleTimers = {};
             const emitCursor = (lang, editor) => {
+                if (cursorThrottleTimers[lang]) return;
+                cursorThrottleTimers[lang] = setTimeout(() => {
+                    cursorThrottleTimers[lang] = null;
+                }, 50);
                 const pos = editor.getCursor();
                 socket.emit('cursor-move', { roomId, lang, line: pos.line, ch: pos.ch });
             };
@@ -1460,18 +1580,22 @@
 
             const color = getCursorColor(uid);
 
-            // Create cursor element
+            // Create zero-width cursor container
             const cursorEl = document.createElement('span');
             cursorEl.className = 'remote-cursor';
-            cursorEl.style.borderLeft = `2px solid ${color}`;
-            cursorEl.style.height = '18px';
-            cursorEl.style.display = 'inline-block';
+
+            // Visible cursor line
+            const cursorLine = document.createElement('span');
+            cursorLine.className = 'remote-cursor-line';
+            cursorLine.style.backgroundColor = color;
 
             // Name label
             const label = document.createElement('span');
             label.className = 'remote-cursor-label';
             label.textContent = name;
             label.style.backgroundColor = color;
+
+            cursorEl.appendChild(cursorLine);
             cursorEl.appendChild(label);
 
             const bookmark = editor.setBookmark({ line, ch }, { widget: cursorEl, insertLeft: true });
@@ -1491,7 +1615,128 @@
             console.log("New message received:", message);
             renderMessage(message);
             dom.chatMessages.scrollTop = dom.chatMessages.scrollHeight;
+
+            // Show unread badge if chat is closed and message is from someone else
+            if (!isChatOpen && localUser && message.senderUid !== localUser.uid) {
+                unreadChatCount++;
+                if (dom.chatBadge) dom.chatBadge.classList.remove('hidden');
+            }
         });
+
+        // ─── Activity/Notification System ──────────────────────────────────
+        const NOTIF_COLORS = {
+            join: '#22c55e',    // emerald
+            leave: '#ef4444',   // red
+            edit: '#3b82f6',    // blue
+            snapshot: '#a855f7', // purple
+            restore: '#eab308'  // amber
+        };
+
+        function getNotifMessage(data) {
+            switch (data.type) {
+                case 'join': return `${data.user} joined the room`;
+                case 'leave': return `${data.user} left the room`;
+                case 'edit': return `${data.user} edited ${data.detail}`;
+                case 'snapshot': return `${data.user} saved a snapshot`;
+                case 'restore': return `${data.user} restored a snapshot`;
+                default: return `${data.user} performed an action`;
+            }
+        }
+
+        function getRelativeTime(timestamp) {
+            const diff = Date.now() - new Date(timestamp).getTime();
+            const secs = Math.floor(diff / 1000);
+            if (secs < 5) return 'just now';
+            if (secs < 60) return `${secs}s ago`;
+            const mins = Math.floor(secs / 60);
+            if (mins < 60) return `${mins}m ago`;
+            const hrs = Math.floor(mins / 60);
+            return `${hrs}h ago`;
+        }
+
+        function renderNotification(data) {
+            // Hide empty state
+            if (dom.notifEmpty) dom.notifEmpty.style.display = 'none';
+
+            const item = document.createElement('div');
+            item.className = 'notif-item';
+            item.dataset.timestamp = data.timestamp;
+
+            const dot = document.createElement('span');
+            dot.className = 'notif-dot';
+            dot.style.backgroundColor = NOTIF_COLORS[data.type] || '#71717a';
+
+            const content = document.createElement('div');
+            content.style.cssText = 'flex: 1; min-width: 0;';
+
+            const msg = document.createElement('p');
+            msg.style.cssText = 'font-size: 13px; color: #e4e4e7; margin: 0;';
+            msg.textContent = getNotifMessage(data);
+
+            const time = document.createElement('span');
+            time.className = 'notif-time';
+            time.style.cssText = 'font-size: 11px; color: #52525b; margin-top: 2px; display: block;';
+            time.textContent = getRelativeTime(data.timestamp);
+
+            content.appendChild(msg);
+            content.appendChild(time);
+            item.appendChild(dot);
+            item.appendChild(content);
+
+            // Prepend (newest first)
+            dom.notifList.insertBefore(item, dom.notifList.firstChild);
+
+            // Cap at 50 items
+            while (dom.notifList.children.length > 51) { // +1 for empty state div
+                dom.notifList.removeChild(dom.notifList.lastChild);
+            }
+        }
+
+        socket.on('activity', (data) => {
+            // Edit debouncing: same user + same detail within 5 seconds → skip
+            if (data.type === 'edit') {
+                const key = `${data.user}_${data.detail}`;
+                if (activityEditTimers[key]) return; // already have a recent one
+                activityEditTimers[key] = setTimeout(() => {
+                    delete activityEditTimers[key];
+                }, 5000);
+            }
+
+            // Store notification
+            notifications.unshift(data);
+            if (notifications.length > 50) notifications.pop();
+
+            // Render it
+            renderNotification(data);
+
+            // Update badge if panel is closed
+            if (!isNotifOpen) {
+                unreadNotifCount++;
+                if (dom.notifBadge) dom.notifBadge.classList.remove('hidden');
+            }
+        });
+
+        // Clear All button
+        if (dom.notifClearBtn) {
+            dom.notifClearBtn.addEventListener('click', () => {
+                notifications = [];
+                // Remove all notif-items but keep the empty state
+                const items = dom.notifList.querySelectorAll('.notif-item');
+                items.forEach(item => item.remove());
+                if (dom.notifEmpty) dom.notifEmpty.style.display = 'flex';
+            });
+        }
+
+        // Refresh relative timestamps every 30 seconds
+        setInterval(() => {
+            const timeEls = document.querySelectorAll('.notif-time');
+            timeEls.forEach(el => {
+                const item = el.closest('.notif-item');
+                if (item && item.dataset.timestamp) {
+                    el.textContent = getRelativeTime(item.dataset.timestamp);
+                }
+            });
+        }, 30000);
 
         // Handle server errors
         socket.on('error-msg', (msg) => {
@@ -1819,13 +2064,19 @@
             // Force display to ensure visibility
             panel.style.display = isAiOpen ? 'flex' : 'none';
 
-            // Exclusive panels: Close Chat if opening AI
+            // Exclusive panels: Close Chat and Notifications if opening AI
             if (isAiOpen) {
                 const chatPanel = document.getElementById('chat-panel');
                 if (chatPanel && chatPanel.classList.contains('active')) {
                     chatPanel.classList.remove('active');
                     chatPanel.style.display = 'none';
                     isChatOpen = false;
+                }
+                const notifPanel = document.getElementById('notif-panel');
+                if (notifPanel && notifPanel.classList.contains('active')) {
+                    notifPanel.classList.remove('active');
+                    notifPanel.style.display = 'none';
+                    isNotifOpen = false;
                 }
 
                 setTimeout(() => {
@@ -1846,18 +2097,58 @@
             panel.style.display = isChatOpen ? 'flex' : 'none';
 
             if (isChatOpen) {
-                // Exclusive panels: Close AI if opening Chat
+                // Reset chat badge
+                unreadChatCount = 0;
+                if (dom.chatBadge) dom.chatBadge.classList.add('hidden');
+
+                // Exclusive panels: Close AI and Notifications if opening Chat
                 const aiPanel = document.getElementById('ai-panel');
                 if (aiPanel && aiPanel.classList.contains('active')) {
                     aiPanel.classList.remove('active');
                     aiPanel.style.display = 'none';
                     isAiOpen = false;
                 }
+                const notifPanel = document.getElementById('notif-panel');
+                if (notifPanel && notifPanel.classList.contains('active')) {
+                    notifPanel.classList.remove('active');
+                    notifPanel.style.display = 'none';
+                    isNotifOpen = false;
+                }
 
                 setTimeout(() => {
                     const input = document.getElementById('chat-input');
                     if (input) input.focus();
                 }, 100);
+            }
+        }
+
+        function toggleNotifications() {
+            const panel = document.getElementById('notif-panel');
+            if (!panel) return;
+
+            panel.classList.toggle('active');
+            isNotifOpen = panel.classList.contains('active');
+
+            panel.style.display = isNotifOpen ? 'flex' : 'none';
+
+            if (isNotifOpen) {
+                // Reset notification badge
+                unreadNotifCount = 0;
+                if (dom.notifBadge) dom.notifBadge.classList.add('hidden');
+
+                // Exclusive panels: Close Chat and AI if opening Notifications
+                const chatPanel = document.getElementById('chat-panel');
+                if (chatPanel && chatPanel.classList.contains('active')) {
+                    chatPanel.classList.remove('active');
+                    chatPanel.style.display = 'none';
+                    isChatOpen = false;
+                }
+                const aiPanel = document.getElementById('ai-panel');
+                if (aiPanel && aiPanel.classList.contains('active')) {
+                    aiPanel.classList.remove('active');
+                    aiPanel.style.display = 'none';
+                    isAiOpen = false;
+                }
             }
         }
 

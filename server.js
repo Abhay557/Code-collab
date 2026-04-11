@@ -242,6 +242,9 @@ io.on('connection', (socket) => {
 
         // Broadcast updated participants to everyone in the room
         io.to(roomId).emit('participants-update', room.participants);
+
+        // Notify others that a user joined
+        socket.to(roomId).emit('activity', { type: 'join', user: user.name, timestamp: new Date().toISOString() });
     });
 
     // Code change
@@ -254,6 +257,9 @@ io.on('connection', (socket) => {
 
         // Broadcast to everyone EXCEPT the sender
         socket.to(roomId).emit('code-update', { lang, value });
+
+        // Notify others about the edit
+        socket.to(roomId).emit('activity', { type: 'edit', user: currentUser ? currentUser.name : 'Unknown', detail: lang.toUpperCase(), timestamp: new Date().toISOString() });
 
         // Debounced snapshot for time-travel (save every 10 seconds of activity)
         if (room.historyTimer) clearTimeout(room.historyTimer);
@@ -529,6 +535,9 @@ Respond with ONLY the review feedback as plain text with bullet points. No code 
 
         // Broadcast updated history right away
         io.to(roomId).emit('history-list', room.history);
+
+        // Notify room about the snapshot
+        io.to(roomId).emit('activity', { type: 'snapshot', user: currentUser ? currentUser.name : 'Unknown', timestamp: new Date().toISOString() });
     });
 
     // Time-Travel: Get history
@@ -561,6 +570,9 @@ Respond with ONLY the review feedback as plain text with bullet points. No code 
             user: currentUser ? currentUser.name : 'Someone',
             timestamp: snapshot.timestamp
         });
+
+        // Notify room about the restore
+        io.to(roomId).emit('activity', { type: 'restore', user: currentUser ? currentUser.name : 'Someone', timestamp: new Date().toISOString() });
     });
 
     // Disconnect (tab close, network drop)
@@ -572,6 +584,9 @@ Respond with ONLY the review feedback as plain text with bullet points. No code 
         if (currentRoom && currentUser) {
             const room = getRoomData(currentRoom);
             if (room) {
+                // Notify others that a user left
+                socket.to(currentRoom).emit('activity', { type: 'leave', user: currentUser.name, timestamp: new Date().toISOString() });
+
                 room.participants = room.participants.filter(p => p.uid !== currentUser.uid);
                 io.to(currentRoom).emit('participants-update', room.participants);
 
