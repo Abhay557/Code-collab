@@ -61,6 +61,7 @@
             }
         }
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/diff@5.2.0/dist/diff.min.js"></script>
 
     <!-- CodeMirror for Syntax Highlighting -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/codemirror.min.css">
@@ -976,6 +977,34 @@
         </div>
     </div>
 
+    <!-- Snapshot Diff Modal -->
+    <div id="diff-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[70] p-4">
+        <div class="bg-[#111] border border-white/[0.08] rounded-2xl w-full max-w-4xl max-h-[85vh] flex flex-col shadow-2xl fade-in overflow-hidden">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-white/[0.08] bg-[#0a0a0a]">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-white font-semibold text-lg" id="diff-modal-title">Snapshot view</h3>
+                        <p class="text-zinc-500 text-xs" id="diff-modal-subtitle">Showing changes</p>
+                    </div>
+                </div>
+                <button id="diff-modal-close" class="text-zinc-500 hover:text-white transition-colors bg-white/[0.05] hover:bg-white/[0.1] rounded-lg p-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+            </div>
+            <div id="diff-content" class="p-0 flex-1 overflow-y-auto font-mono text-sm bg-[#0a0a0a]">
+                <!-- Diff lines go here -->
+            </div>
+        </div>
+    </div>
+
     <!-- Chat Popup -->
     <div id="chat-panel" class="ai-popup">
         <div id="chat-header"
@@ -1372,6 +1401,94 @@
         }
 
         // â”€â”€â”€ Custom Confirm Dialog Logic â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        const diffModal = document.getElementById('diff-modal');
+        const diffModalCloseBtn = document.getElementById('diff-modal-close');
+        
+        diffModalCloseBtn.addEventListener('click', () => {
+            diffModal.classList.add('hidden');
+        });
+
+        function showDiffModal(currentSnap, previousSnap, indexNum) {
+            document.getElementById('diff-modal-title').textContent = `Snapshot #${indexNum}`;
+            const timeStr = new Date(currentSnap.timestamp).toLocaleString();
+            document.getElementById('diff-modal-subtitle').textContent = `Saved by ${currentSnap.user} at ${timeStr}`;
+
+            const diffContent = document.getElementById('diff-content');
+            diffContent.innerHTML = '';
+
+            const langs = ['html', 'css', 'js'];
+            let anyDiff = false;
+
+            langs.forEach(lang => {
+                const oldText = previousSnap ? previousSnap[lang] : '';
+                const newText = currentSnap[lang];
+
+                if (oldText === newText && previousSnap) return; // No change in this lang
+
+                anyDiff = true;
+
+                // Section header
+                const header = document.createElement('div');
+                header.className = 'bg-[#1a1a1a] text-zinc-300 px-4 py-2 text-xs font-bold uppercase tracking-wider sticky top-0 border-y border-white/[0.05] z-10';
+                header.textContent = lang.toUpperCase();
+                diffContent.appendChild(header);
+
+                // Diff lines container
+                const pre = document.createElement('pre');
+                pre.className = 'w-full m-0 p-0 overflow-x-auto';
+                
+                if (!window.Diff) {
+                    pre.textContent = newText;
+                    diffContent.appendChild(pre);
+                    return;
+                }
+
+                const diffs = Diff.diffLines(oldText, newText);
+                diffs.forEach(part => {
+                    const hasNewLine = part.value.endsWith('\n');
+                    const value = hasNewLine ? part.value.slice(0, -1) : part.value; // prevent extra empty lines
+                    
+                    if (!value) return;
+
+                    const lines = value.split('\n');
+                    lines.forEach(line => {
+                        const div = document.createElement('div');
+                        div.className = 'px-4 py-0.5 min-w-max leading-normal whitespace-pre';
+                        const prefix = document.createElement('span');
+                        prefix.className = 'inline-block w-6 text-center select-none font-bold mr-2';
+
+                        if (part.added) {
+                            div.classList.add('bg-green-500/20', 'text-green-300');
+                            prefix.textContent = '+';
+                            prefix.classList.add('text-green-500');
+                        } else if (part.removed) {
+                            div.classList.add('bg-red-500/20', 'text-red-300');
+                            prefix.textContent = '-';
+                            prefix.classList.add('text-red-500');
+                        } else {
+                            div.classList.add('text-zinc-400');
+                            prefix.textContent = ' ';
+                        }
+
+                        div.appendChild(prefix);
+                        div.appendChild(document.createTextNode(line));
+                        pre.appendChild(div);
+                    });
+                });
+
+                diffContent.appendChild(pre);
+            });
+
+            if (!anyDiff) {
+                const emptyMsg = document.createElement('div');
+                emptyMsg.className = 'text-center text-zinc-500 py-10';
+                emptyMsg.textContent = 'No changes to display.';
+                diffContent.appendChild(emptyMsg);
+            }
+
+            diffModal.classList.remove('hidden');
+        }
+
         function showConfirmModal(title, message, onConfirm) {
             dom.confirmTitle.textContent = title;
             dom.confirmMessage.textContent = message;
@@ -1912,13 +2029,27 @@
                         </div>
                         <div class="text-gray-500 text-[10px] font-mono">#${realIndex + 1}</div>
                     </div>
-                    <button class="restore-btn w-full text-center bg-white/[0.04] border border-white/[0.08] text-zinc-400 text-[11px] py-1.5 rounded-md hover:bg-white hover:text-black transition-all font-semibold flex flex-wrap items-center justify-center gap-1.5">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
-                        </svg>
-                        Restore
-                    </button>
+                    <div class="flex gap-2">
+                        <button class="view-diff-btn flex-1 text-center bg-white/[0.04] border border-white/[0.08] text-zinc-400 text-[11px] py-1.5 rounded-md hover:bg-white hover:text-black transition-all font-semibold flex items-center justify-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-white/[0.2]">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                            View
+                        </button>
+                        <button class="restore-btn flex-1 text-center bg-white/[0.04] border border-white/[0.08] text-zinc-400 text-[11px] py-1.5 rounded-md hover:bg-white hover:text-black transition-all font-semibold flex items-center justify-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-white/[0.2]">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
+                            </svg>
+                            Restore
+                        </button>
+                    </div>
                 `;
+                
+                item.querySelector('.view-diff-btn').addEventListener('click', () => {
+                    showDiffModal(snap, prevSnap, realIndex + 1);
+                });
+
                 item.querySelector('.restore-btn').addEventListener('click', () => {
                     showConfirmModal(
                         'Restore Snapshot',
