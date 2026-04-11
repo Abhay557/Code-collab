@@ -17,6 +17,7 @@ Designed for speed and simplicity, Code Collab requires no sign-ups or installat
 ![Live Cursors Placeholder](livecursorpreview.png)
 - **Built-in AI Assistant:** A floating AI panel powered by Hugging Face (`Qwen2.5-Coder`). Describe what you want to build, and the AI will generate the HTML, CSS, and JS, injecting it directly into your editors.
 - **AI Code Review:** Ask the AI to review your current code for bugs, best practices, accessibility, and performance optimizations.
+![AI Code Review Placeholder](aipreview.png)
 - **Live Preview & Console:** Instantly view the results of your code in a sandboxed iframe. A built-in console helps you catch and debug JavaScript errors.
 - **Tab-Freeze Security:** Built-in infinite loop protection monitors user JavaScript. If a script runs too long or freezes the iframe, it is automatically terminated. A "Safe Mode" toggle allows you to disable JavaScript entirely.
 - **Time-Travel History & Diff Viewer:** Changes are automatically saved every 10 seconds. You can explicitly manually save milestones as well. Browse up to 50 previous versions of your room's code, and use the new "View" tool to launch a Git-style visualization modal showing character/line-level CSS, HTML, and JS differences.
