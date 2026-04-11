@@ -13,17 +13,21 @@ Designed for speed and simplicity, Code Collab requires no sign-ups or installat
 ##  Features
 
 - **Real-time Collaboration:** Code together in absolute real-time without latency. Cursors and edits sync instantly across all clients in a room.
-- **Cursor Sharing:** See where your collaborators are typing in real-time with color-coded, labeled cursor indicators.
+- **Cursor Sharing & Stability:** See where your collaborators are typing in real-time with color-coded, labeled cursor indicators, backed by a zero-layout-shift proxy mechanism.
+![Live Cursors Placeholder]()
 - **Built-in AI Assistant:** A floating AI panel powered by Hugging Face (`Qwen2.5-Coder`). Describe what you want to build, and the AI will generate the HTML, CSS, and JS, injecting it directly into your editors.
 - **AI Code Review:** Ask the AI to review your current code for bugs, best practices, accessibility, and performance optimizations.
 - **Live Preview & Console:** Instantly view the results of your code in a sandboxed iframe. A built-in console helps you catch and debug JavaScript errors.
 - **Tab-Freeze Security:** Built-in infinite loop protection monitors user JavaScript. If a script runs too long or freezes the iframe, it is automatically terminated. A "Safe Mode" toggle allows you to disable JavaScript entirely.
-- **Time-Travel History:** Changes are automatically saved every 10 seconds. Open the History panel to browse up to 50 previous versions of your room's code.
-- **Manual Snapshots & Diff View:** Explicitly save milestones by forcing a manual snapshot. The UI calculates file-level changes (HTML, CSS, JS) so you know exactly what changed between versions, and you can restore any snapshot with a click.
+- **Time-Travel History & Diff Viewer:** Changes are automatically saved every 10 seconds. You can explicitly manually save milestones as well. Browse up to 50 previous versions of your room's code, and use the new "View" tool to launch a Git-style visualization modal showing character/line-level CSS, HTML, and JS differences.
+![Timeline Diff Viewer Placeholder]()
+- **Activity Notification Center:** A real-time notification feed tracks user presence, snapshot generation, and major code edits. A red notification badge alerts you via the platform's header.
+![Activity Notification Feed Placeholder]()
+- **Room Chat & Notifications:** Communicate with your team via the built-in room chat panel. If the chat panel is obscured and a peer sends a message, a highly visible status indicator flashes to notify you.
+![Chat Notification Badge Placeholder]()
 - **Zero Friction:** No accounts, no passwords, no setup. Click "Create Room," share the URL, and start coding within seconds.
 - **Export Project:** One-click download of your entire workspace as a zipped `.zip` file, ready to be dropped into VS Code or deployed.
 - **Premium UI:** A beautiful, responsive, and modern interface built with Tailwind CSS, featuring custom CodeMirror themes and warm orange/amber aesthetics.
-- **Room Chat:** Communicate with your team in real-time via the built-in room chat panel.
 
 ---
 
