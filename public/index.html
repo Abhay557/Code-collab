@@ -220,34 +220,38 @@
             display: inline-block;
             width: 0;
             height: 0;
-            vertical-align: top;
+            vertical-align: middle;
             pointer-events: none;
-            z-index: 10;
+            z-index: 50;
         }
 
         .remote-cursor-line {
             position: absolute;
-            top: 0;
+            top: -10px; /* shift up to align with text center */
             left: 0;
-            width: 2px;
-            height: 1.2em;
+            width: 2.5px;
+            height: 20px; /* Fixed height for consistent look */
             pointer-events: none;
+            box-shadow: 0 0 4px rgba(0,0,0,0.3);
+            border-radius: 2px;
         }
 
         .remote-cursor-label {
             position: absolute;
-            top: -18px;
-            left: -2px;
-            font-size: 10px;
-            font-family: 'Inter', sans-serif;
-            font-weight: 600;
-            padding: 1px 5px;
-            border-radius: 3px 3px 3px 0;
+            top: -32px;
+            left: 0;
+            font-size: 11px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 4px;
             white-space: nowrap;
             color: #fff;
-            line-height: 14px;
+            line-height: normal;
             pointer-events: none;
-            opacity: 0.9;
+            opacity: 1;
+            z-index: 51;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.4);
             transition: opacity 0.3s ease;
         }
 
