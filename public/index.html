@@ -399,16 +399,80 @@
         }
 
         .resizer {
-            background: rgba(255, 255, 255, 0.06);
-            width: 2px;
+            background: rgba(255, 255, 255, 0.08);
+            width: 4px; /* Increased from 2px */
             cursor: col-resize;
             flex-shrink: 0;
-            z-index: 10;
-            transition: background 0.15s;
+            z-index: 100;
+            transition: background 0.2s, width 0.2s;
+            position: relative;
+            margin: 0 -2px; /* Pull it slightly over the panels to maintain spacing */
         }
 
-        .resizer:hover {
-            background: rgba(255, 255, 255, 0.2);
+        .resizer:hover, .resizer.active {
+            background: rgba(255, 255, 255, 0.35);
+            width: 4px;
+        }
+
+        .resizer.active {
+            background: #fff;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+            z-index: 101;
+        }
+
+        /* Expanded Hit Area */
+        .resizer::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: -15px;
+            right: -15px;
+            z-index: 1;
+            cursor: col-resize;
+        }
+
+        /* Visual Handle */
+        .resizer::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 2px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 4px;
+            opacity: 0.3; /* Always slightly visible */
+            transition: all 0.2s;
+            pointer-events: none;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+        }
+
+        .resizer:hover::before, .resizer.active::before {
+            opacity: 1;
+            height: 60px;
+            background: #fff;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+        }
+
+        .resizing {
+            cursor: col-resize !important;
+            user-select: none !important;
+        }
+
+        .resizing * {
+            pointer-events: none !important;
+        }
+
+        .resizing #resizer {
+            pointer-events: all !important;
+        }
+
+        #editor-panel,
+        #output-panel {
+            min-width: 0;
+            min-height: 0;
         }
 
         /* â”€â”€â”€ AI â”€â”€â”€ */
@@ -2303,25 +2367,53 @@
         // â”€â”€â”€ Panel Resizing â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         function initResizing() {
             let isResizing = false;
-            dom.resizer.addEventListener('mousedown', (e) => {
+
+            const startResize = (e) => {
+                // Ensure we handle both mouse and touch events
+                const event = e.touches ? e.touches[0] : e;
+                if (e.cancelable) e.preventDefault();
+                
                 isResizing = true;
-                document.body.style.cursor = 'col-resize';
-            });
-            document.addEventListener('mousemove', (e) => {
-                if (!isResizing || isChatOpen) return;
+                dom.resizer.classList.add('active');
+                document.body.classList.add('resizing');
+            };
+
+            const doResize = (e) => {
+                if (!isResizing) return;
+                const event = e.touches ? e.touches[0] : e;
+                
                 const wrapper = dom.contentWrapper.getBoundingClientRect();
-                const editorWidth = e.clientX - wrapper.left;
+                const clientX = event.clientX;
+                const editorWidth = clientX - wrapper.left;
                 const outputWidth = wrapper.width - editorWidth - dom.resizer.offsetWidth;
-                if (editorWidth > 200 && outputWidth > 200) {
+                
+                // Keep both panels at a reasonable minimum width
+                if (editorWidth > 100 && outputWidth > 100) {
                     dom.editorPanel.style.flexBasis = `${editorWidth}px`;
                     dom.outputPanel.style.flexBasis = `${outputWidth}px`;
                 }
-            });
-            document.addEventListener('mouseup', () => {
-                isResizing = false;
-                document.body.style.cursor = 'default';
-                refreshEditors();
-            });
+            };
+
+            const stopResize = () => {
+                if (isResizing) {
+                    isResizing = false;
+                    dom.resizer.classList.remove('active');
+                    document.body.classList.remove('resizing');
+                    refreshEditors();
+                }
+            };
+
+            // Mousedown / Touchstart
+            dom.resizer.addEventListener('mousedown', startResize);
+            dom.resizer.addEventListener('touchstart', startResize, { passive: false });
+
+            // Mousemove / Touchmove
+            document.addEventListener('mousemove', doResize);
+            document.addEventListener('touchmove', doResize, { passive: false });
+
+            // Mouseup / Touchend
+            document.addEventListener('mouseup', stopResize);
+            document.addEventListener('touchend', stopResize);
         }
 
 
