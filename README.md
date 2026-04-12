@@ -4,23 +4,6 @@ Welcome to the official documentation and issue tracker for **Codependal**, a hi
 
 > **Notice:** The source code for Codependal is closed and proprietary. This repository serves as the public-facing hub for user feedback, bug tracking, and feature roadmaps.
 
-## Overview
-
-Codependal is engineered to enable seamless, latency-free pair programming and team collaboration. It provides a highly stable and synchronized environment for developers to write, review, and debug code together in real time, bridging the gap between distributed teams.
-
-## Features
-
-* **Real-Time Sync:** Instant, conflict-free code synchronization across multiple concurrent clients.
-* **Modern Architecture:** Engineered for low latency and high availability to ensure uninterrupted coding sessions.
-* **Secure Environment:** Enterprise-grade security handling for user sessions and code snippets.
-
-## Technology Stack
-
-Codependal is powered by a robust, modern web ecosystem to ensure scalability and speed:
-* **Frontend:** React, Next.js
-* **Real-Time Engine:** Socket.IO
-* **Database:** MongoDB
-
 ## License & Source Access
 
 Codependal is proprietary software. The source code is closed and is not licensed for public distribution, modification, or commercial use. All rights are reserved. 
@@ -38,3 +21,33 @@ While the source code is closed, we actively welcome feedback from our user comm
 ## Support & Contact
 
 For technical support, account issues, or business inquiries, please reach out to us at `abhay557.com@gmail.con ``contact@abhaymourya.in`.
+
+
+
+
+## Overview
+
+Codependal is engineered to enable seamless, latency-free pair programming and team collaboration. It provides a highly stable and synchronized environment for developers to write, review, and debug code together in real time, bridging the gap between distributed teams.
+![Preview](preview.png)
+
+## Features
+
+- **Real-time Collaboration:** Code together in absolute real-time without latency. Cursors and edits sync instantly across all clients in a room.
+- **Cursor Sharing & Stability:** See where your collaborators are typing in real-time with color-coded, labeled cursor indicators, backed by a zero-layout-shift proxy mechanism.
+![Live Cursors Placeholder](livecursorpreview.png)
+- **Built-in AI Assistant:** A floating AI panel powered by Hugging Face (`Qwen2.5-Coder`). Describe what you want to build, and the AI will generate the HTML, CSS, and JS, injecting it directly into your editors.
+- **AI Code Review:** Ask the AI to review your current code for bugs, best practices, accessibility, and performance optimizations.
+![AI Code Review Placeholder](aipreview.png)
+- **Live Preview & Console:** Instantly view the results of your code in a sandboxed iframe. A built-in console helps you catch and debug JavaScript errors.
+- **Tab-Freeze Security:** Built-in infinite loop protection monitors user JavaScript. If a script runs too long or freezes the iframe, it is automatically terminated. A "Safe Mode" toggle allows you to disable JavaScript entirely.
+- **Time-Travel History & Diff Viewer:** Changes are automatically saved every 10 seconds. You can explicitly manually save milestones as well. Browse up to 50 previous versions of your room's code, and use the new "View" tool to launch a Git-style visualization modal showing character/line-level CSS, HTML, and JS differences.
+![Timeline Diff Viewer Placeholder](timepreview.png)
+- **Activity Notification Center:** A real-time notification feed tracks user presence, snapshot generation, and major code edits. A red notification badge alerts you via the platform's header.
+![Activity Notification Feed Placeholder](notification.png)
+- **Room Chat & Notifications:** Communicate with your team via the built-in room chat panel. If the chat panel is obscured and a peer sends a message, a highly visible status indicator flashes to notify you.
+![Chat Notification Badge Placeholder](chatpreview.png)
+- **Zero Friction:** No accounts, no passwords, no setup. Click "Create Room," share the URL, and start coding within seconds.
+- **Export Project:** One-click download of your entire workspace as a zipped `.zip` file, ready to be dropped into VS Code or deployed.
+- **Premium UI:** A beautiful, responsive, and modern interface built with Tailwind CSS, featuring custom CodeMirror themes and warm orange/amber aesthetics.
+
+---
