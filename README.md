@@ -1,4 +1,4 @@
-# Codependal
+# Codependal (Code-Collab)
 
 Welcome to the official documentation and issue tracker for **Codependal**, a high-performance, real-time collaborative code editor. 
 
