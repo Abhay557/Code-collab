@@ -13,6 +13,9 @@ try {
 
 const PORT = process.env.PORT || 3000;
 
+// ─── Constants ────────────────────────────────────────────────────────
+const MAX_ROOM_CAPACITY = 6;
+
 // ─── In-Memory Room Store ─────────────────────────────────────────────
 const rooms = new Map();
 
@@ -30,6 +33,8 @@ function createRoom(roomId, isPublic) {
         participants: [],
         messages: [],
         consoleLogs: [],
+        votes: {},              // targetUid -> Set of voterUids
+        kickedUids: [],         // list of banned UIDs
         history: [],            // Time-travel snapshots
         historyTimer: null,     // Debounce timer for snapshots
         createdAt: new Date()
@@ -74,7 +79,7 @@ app.post('/api/rooms', (req, res) => {
 app.get('/api/rooms/random/public', (req, res) => {
     const publicRooms = [];
     rooms.forEach((room, id) => {
-        if (room.isPublic && room.participants.length < 6) {
+        if (room.isPublic && room.participants.length < MAX_ROOM_CAPACITY) {
             publicRooms.push(id);
         }
     });
@@ -223,12 +228,25 @@ io.on('connection', (socket) => {
             return;
         }
 
+        // Check if kicked
+        if (room.kickedUids.includes(user.uid)) {
+            socket.emit('error-msg', 'You have been kicked from this room.');
+            return;
+        }
+
         currentRoom = roomId;
         currentUser = user;
         socket.join(roomId);
 
         // Add participant (avoid duplicates by uid)
         room.participants = room.participants.filter(p => p.uid !== user.uid);
+
+        // Check capacity
+        if (room.participants.length >= MAX_ROOM_CAPACITY) {
+            socket.emit('error-msg', `Room is full. Maximum ${MAX_ROOM_CAPACITY} participants allowed.`);
+            return;
+        }
+
         room.participants.push(user);
 
         // Send full room state to the joining user
@@ -370,10 +388,10 @@ CRITICAL RULES:
             const response = await fetch(`${AI_BACKEND}/generate`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    messages: [{ role: 'user', content: codeContext }], 
-                    max_tokens: 2048, 
-                    temperature: 0.7 
+                body: JSON.stringify({
+                    messages: [{ role: 'user', content: codeContext }],
+                    max_tokens: 2048,
+                    temperature: 0.7
                 })
             });
 
@@ -432,6 +450,53 @@ CRITICAL RULES:
         }
     });
 
+    // Vote Kick logic
+    socket.on('vote-kick', ({ roomId, targetUid }) => {
+        const room = getRoomData(roomId);
+        if (!room || !currentUser) return;
+
+        const target = room.participants.find(p => p.uid === targetUid);
+        if (!target) return;
+        if (targetUid === currentUser.uid) return; // Can't kick self
+
+        // Initialize votes for target
+        if (!room.votes[targetUid]) room.votes[targetUid] = new Set();
+
+        // Add voter
+        room.votes[targetUid].add(currentUser.uid);
+
+        const currentVotes = room.votes[targetUid].size;
+        const requiredVotes = Math.max(2, Math.ceil(room.participants.length / 2));
+
+        // Notify room about the vote count
+        io.to(roomId).emit('vote-update', {
+            targetUid,
+            targetName: target.name,
+            voterName: currentUser.name,
+            currentVotes,
+            requiredVotes
+        });
+
+        if (currentVotes >= requiredVotes && room.participants.length >= 3) {
+            // Kick the user
+            room.kickedUids.push(targetUid);
+            room.participants = room.participants.filter(p => p.uid !== targetUid);
+            delete room.votes[targetUid];
+
+            // Notify everyone
+            io.to(roomId).emit('user-kicked', { uid: targetUid, name: target.name });
+            io.to(roomId).emit('participants-update', room.participants);
+            io.to(roomId).emit('activity', {
+                type: 'leave',
+                user: target.name,
+                detail: 'Kicked by vote',
+                timestamp: new Date().toISOString()
+            });
+
+            // The target will handle their own disconnection on the 'user-kicked' event
+        }
+    });
+
     // AI Code Review
     socket.on('ai-review', async ({ roomId }) => {
         const room = getRoomData(roomId);
@@ -475,10 +540,10 @@ Respond with ONLY the review feedback as plain text with bullet points. No code 
             const response = await fetch(`${AI_BACKEND}/generate`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    messages: [{ role: 'user', content: reviewPrompt }], 
-                    max_tokens: 2048, 
-                    temperature: 0.3 
+                body: JSON.stringify({
+                    messages: [{ role: 'user', content: reviewPrompt }],
+                    max_tokens: 2048,
+                    temperature: 0.3
                 })
             });
 

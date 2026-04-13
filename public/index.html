@@ -886,6 +886,15 @@
                         </svg>
                         <span id="notif-badge" class="notif-badge hidden"></span>
                     </button>
+                    <button id="toggle-participants-btn" onclick="toggleParticipants()"
+                        class="relative flex items-center gap-1.5 bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.08] text-white font-medium py-1.5 px-2.5 rounded-lg transition-all text-xs"
+                        title="Participants">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20"
+                            fill="currentColor">
+                            <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
+                        </svg>
+                        <span id="participant-count-badge" class="ml-0.5 text-[10px] text-zinc-500 font-bold">0</span>
+                    </button>
                     <button id="leave-room-btn"
                         class="btn-danger font-medium py-1.5 px-3 rounded-lg text-xs">Leave</button>
                 </div>
@@ -1237,6 +1246,35 @@
         </div>
     </div>
 
+    <!-- Participants Popup -->
+    <div id="participants-panel" class="ai-popup">
+        <div
+            class="bg-[#111] px-5 py-4 flex items-center justify-between border-b border-white/[0.06] rounded-t-xl select-none">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-white/[0.06] flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-zinc-400" viewBox="0 0 20 20"
+                        fill="currentColor">
+                        <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-white text-sm">Participants</h3>
+                    <p id="participant-online-count" class="text-[10px] text-zinc-500 font-medium">0 members present</p>
+                </div>
+            </div>
+            <button onclick="toggleParticipants()" class="text-zinc-500 hover:text-white transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd"
+                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                        clip-rule="evenodd" />
+                </svg>
+            </button>
+        </div>
+        <div id="participants-list-full" class="flex-grow overflow-y-auto p-4 space-y-3 scrollbar-hide">
+            <!-- Full participant list with vote buttons -->
+        </div>
+    </div>
+
     <script>
         // Global error handler to catch any runtime errors
         window.onerror = function (msg, url, line, col, error) {
@@ -1310,7 +1348,11 @@
             notifEmpty: document.getElementById('notif-empty'),
             notifBadge: document.getElementById('notif-badge'),
             notifClearBtn: document.getElementById('notif-clear-btn'),
-            chatBadge: document.getElementById('chat-badge')
+            chatBadge: document.getElementById('chat-badge'),
+            participantsPanel: document.getElementById('participants-panel'),
+            participantsFullList: document.getElementById('participants-list-full'),
+            participantCountBadge: document.getElementById('participant-count-badge'),
+            participantOnlineCount: document.getElementById('participant-online-count')
         };
 
         let currentRoomId = null;
@@ -1320,10 +1362,13 @@
         let isChatOpen = false;
         let isAiOpen = false;
         let isNotifOpen = false;
+        let isParticipantsOpen = false;
         let isRemoteUpdate = false; // flag to prevent echo loops
         let isAiGenerating = false;
         let isSafeModeOn = false;
         let heartbeatTimer = null;
+        let currentParticipants = [];
+        let activeVotes = {}; // { targetUid: { count, required } }
         let unreadChatCount = 0;
         let unreadNotifCount = 0;
         let notifications = [];
@@ -1808,6 +1853,23 @@
             updateParticipants(participants);
         });
 
+        socket.on('vote-update', ({ targetUid, targetName, voterName, currentVotes, requiredVotes }) => {
+            activeVotes[targetUid] = { count: currentVotes, required: requiredVotes };
+            showNotification(`${voterName} voted to kick ${targetName} (${currentVotes}/${requiredVotes} required)`, 'info');
+            updateParticipants(currentParticipants);
+        });
+
+        socket.on('user-kicked', ({ uid, name }) => {
+            if (localUser && uid === localUser.uid) {
+                alert('You have been kicked from the room by majority vote.');
+                leaveRoom();
+            } else {
+                showNotification(`ðŸ’€ ${name} was kicked from the room.`, 'warning');
+                delete activeVotes[uid];
+                updateParticipants(currentParticipants);
+            }
+        });
+
         // Receive new chat messages
         socket.on('new-message', (message) => {
             console.log("New message received:", message);
@@ -1938,7 +2000,12 @@
 
         // Handle server errors
         socket.on('error-msg', (msg) => {
-            showNotification(msg);
+            showNotification(msg, 'error');
+            
+            // If we're stuck in editor view without a state, go back home
+            if (dom.editor.style.display === 'flex' && !htmlEditor.getValue()) {
+                leaveRoom();
+            }
         });
 
         // â”€â”€â”€ AI Socket.IO Listeners â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -2241,18 +2308,98 @@
             }
         }
 
-        // â”€â”€â”€ Participants Display â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ─── Participants Display ──────────────────────────────────
         function updateParticipants(participants) {
+            currentParticipants = participants;
+            
+            // Update badge and count text
+            if (dom.participantCountBadge) dom.participantCountBadge.textContent = participants.length;
+            if (dom.participantOnlineCount) dom.participantOnlineCount.textContent = `${participants.length} member${participants.length !== 1 ? 's' : ''} present`;
+
+            // 1. Header chips (simplified version)
             dom.participants.innerHTML = '';
-            participants.forEach(p => {
-                const pEl = document.createElement('div');
-                pEl.className = 'flex items-center gap-2 bg-white/[0.06] border border-white/[0.06] px-3 py-1 rounded-full';
-                const avatar = document.createElement('div');
-                avatar.className = 'w-5 h-5 rounded-full';
-                avatar.style.backgroundColor = stringToColor(p.uid);
-                pEl.append(avatar, p.name);
-                dom.participants.appendChild(pEl);
+            participants.slice(0, 3).forEach(p => {
+                const chip = document.createElement('div');
+                chip.className = 'w-6 h-6 rounded-full border border-[#0a0a0a] flex-shrink-0 flex items-center justify-center text-[10px] font-bold text-white';
+                chip.style.backgroundColor = getCursorColor(p.uid);
+                chip.textContent = p.name.charAt(0).toUpperCase();
+                chip.title = p.name;
+                dom.participants.appendChild(chip);
             });
+            if (participants.length > 3) {
+                const more = document.createElement('div');
+                more.className = 'w-6 h-6 rounded-full border border-[#0a0a0a] bg-zinc-800 flex items-center justify-center text-[9px] font-bold text-zinc-400';
+                more.textContent = `+${participants.length - 3}`;
+                dom.participants.appendChild(more);
+            }
+
+            // 2. Full panel list
+            if (dom.participantsFullList) {
+                dom.participantsFullList.innerHTML = '';
+                participants.forEach(p => {
+                    const isMe = p.uid === localUser.uid;
+                    const item = document.createElement('div');
+                    item.className = 'flex items-center justify-between bg-white/[0.03] border border-white/[0.06] p-3 rounded-xl hover:border-white/[0.1] transition-all';
+                    
+                    const left = document.createElement('div');
+                    left.className = 'flex items-center gap-3';
+                    
+                    const avatar = document.createElement('div');
+                    avatar.className = 'w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-lg';
+                    avatar.style.backgroundColor = getCursorColor(p.uid);
+                    avatar.textContent = p.name.charAt(0).toUpperCase();
+                    
+                    const info = document.createElement('div');
+                    const name = document.createElement('div');
+                    name.className = 'text-sm font-semibold text-white flex items-center gap-2';
+                    name.textContent = p.name;
+                    if (isMe) {
+                        const badge = document.createElement('span');
+                        badge.className = 'bg-blue-500/10 text-blue-500 text-[10px] px-1.5 py-0.5 rounded-md';
+                        badge.textContent = 'You';
+                        name.appendChild(badge);
+                    }
+                    
+                    const status = document.createElement('div');
+                    status.className = 'text-[10px] text-zinc-500 font-medium';
+                    status.textContent = 'Active now';
+                    
+                    info.appendChild(name);
+                    info.appendChild(status);
+                    left.appendChild(avatar);
+                    left.appendChild(info);
+                    item.appendChild(left);
+                    
+                    if (!isMe) {
+                        const right = document.createElement('div');
+                        right.className = 'flex flex-col items-end gap-1.5';
+                        
+                        const voteBtn = document.createElement('button');
+                        const voteData = activeVotes[p.uid] || { count: 0, required: Math.max(2, Math.ceil(participants.length / 2)) };
+                        
+                        const hasVoted = false; // We don't track who voted specifically on client yet, but we could
+                        
+                        voteBtn.className = `px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${voteData.count > 0 ? 'bg-red-500 text-white border-red-500' : 'bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20'}`;
+                        voteBtn.innerHTML = `
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 1.944A11.954 11.954 0 012.166 5C2.056 5.649 2 6.319 2 7c0 5.225 3.34 9.67 8 11.317C14.66 16.67 18 12.225 18 7c0-.682-.057-1.35-.166-2.001A11.954 11.954 0 0110 1.944zM11 14a1 1 0 11-2 0 1 1 0 012 0zm-1-7a1 1 0 00-1 1v3a1 1 0 002 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                            </svg>
+                            Vote Kick (${voteData.count}/${voteData.required})
+                        `;
+                        voteBtn.onclick = () => voteKick(p.uid);
+                        
+                        right.appendChild(voteBtn);
+                        item.appendChild(right);
+                    }
+                    
+                    dom.participantsFullList.appendChild(item);
+                });
+            }
+        }
+
+        function voteKick(targetUid) {
+            if (!currentRoomId) return;
+            socket.emit('vote-kick', { roomId: currentRoomId, targetUid });
         }
 
         // â”€â”€â”€ AI Prompt Submit â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -2279,17 +2426,13 @@
             // Exclusive panels: Close Chat and Notifications if opening AI
             if (isAiOpen) {
                 const chatPanel = document.getElementById('chat-panel');
-                if (chatPanel && chatPanel.classList.contains('active')) {
-                    chatPanel.classList.remove('active');
-                    chatPanel.style.display = 'none';
-                    isChatOpen = false;
-                }
+                if (chatPanel && chatPanel.classList.contains('active')) toggleChat();
+                
                 const notifPanel = document.getElementById('notif-panel');
-                if (notifPanel && notifPanel.classList.contains('active')) {
-                    notifPanel.classList.remove('active');
-                    notifPanel.style.display = 'none';
-                    isNotifOpen = false;
-                }
+                if (notifPanel && notifPanel.classList.contains('active')) toggleNotifications();
+
+                const participantsPanel = dom.participantsPanel;
+                if (participantsPanel && participantsPanel.classList.contains('active')) toggleParticipants();
 
                 setTimeout(() => {
                     const input = document.getElementById('ai-input');
@@ -2313,19 +2456,15 @@
                 unreadChatCount = 0;
                 if (dom.chatBadge) dom.chatBadge.classList.add('hidden');
 
-                // Exclusive panels: Close AI and Notifications if opening Chat
+                // Exclusive panels: Close others
                 const aiPanel = document.getElementById('ai-panel');
-                if (aiPanel && aiPanel.classList.contains('active')) {
-                    aiPanel.classList.remove('active');
-                    aiPanel.style.display = 'none';
-                    isAiOpen = false;
-                }
+                if (aiPanel && aiPanel.classList.contains('active')) toggleAi();
+                
                 const notifPanel = document.getElementById('notif-panel');
-                if (notifPanel && notifPanel.classList.contains('active')) {
-                    notifPanel.classList.remove('active');
-                    notifPanel.style.display = 'none';
-                    isNotifOpen = false;
-                }
+                if (notifPanel && notifPanel.classList.contains('active')) toggleNotifications();
+
+                const participantsPanel = dom.participantsPanel;
+                if (participantsPanel && participantsPanel.classList.contains('active')) toggleParticipants();
 
                 setTimeout(() => {
                     const input = document.getElementById('chat-input');
@@ -2348,19 +2487,39 @@
                 unreadNotifCount = 0;
                 if (dom.notifBadge) dom.notifBadge.classList.add('hidden');
 
-                // Exclusive panels: Close Chat and AI if opening Notifications
+                // Exclusive panels: Close others
                 const chatPanel = document.getElementById('chat-panel');
-                if (chatPanel && chatPanel.classList.contains('active')) {
-                    chatPanel.classList.remove('active');
-                    chatPanel.style.display = 'none';
-                    isChatOpen = false;
-                }
+                if (chatPanel && chatPanel.classList.contains('active')) toggleChat();
+                
                 const aiPanel = document.getElementById('ai-panel');
-                if (aiPanel && aiPanel.classList.contains('active')) {
-                    aiPanel.classList.remove('active');
-                    aiPanel.style.display = 'none';
-                    isAiOpen = false;
-                }
+                if (aiPanel && aiPanel.classList.contains('active')) toggleAi();
+
+                const participantsPanel = dom.participantsPanel;
+                if (participantsPanel && participantsPanel.classList.contains('active')) toggleParticipants();
+            }
+        }
+
+        function toggleParticipants() {
+            const panel = dom.participantsPanel;
+            if (!panel) return;
+
+            panel.classList.toggle('active');
+            isParticipantsOpen = panel.classList.contains('active');
+
+            panel.style.display = isParticipantsOpen ? 'flex' : 'none';
+
+            if (isParticipantsOpen) {
+                // Exclusive panels: Close others
+                const chatPanel = document.getElementById('chat-panel');
+                if (chatPanel && chatPanel.classList.contains('active')) toggleChat();
+                
+                const aiPanel = document.getElementById('ai-panel');
+                if (aiPanel && aiPanel.classList.contains('active')) toggleAi();
+
+                const notifPanel = document.getElementById('notif-panel');
+                if (notifPanel && notifPanel.classList.contains('active')) toggleNotifications();
+                
+                updateParticipants(currentParticipants);
             }
         }
 
