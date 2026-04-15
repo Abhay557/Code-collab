@@ -400,16 +400,19 @@
 
         .resizer {
             background: rgba(255, 255, 255, 0.08);
-            width: 4px; /* Increased from 2px */
+            width: 4px;
+            /* Increased from 2px */
             cursor: col-resize;
             flex-shrink: 0;
             z-index: 100;
             transition: background 0.2s, width 0.2s;
             position: relative;
-            margin: 0 -2px; /* Pull it slightly over the panels to maintain spacing */
+            margin: 0 -2px;
+            /* Pull it slightly over the panels to maintain spacing */
         }
 
-        .resizer:hover, .resizer.active {
+        .resizer:hover,
+        .resizer.active {
             background: rgba(255, 255, 255, 0.35);
             width: 4px;
         }
@@ -443,13 +446,15 @@
             height: 40px;
             background: rgba(255, 255, 255, 0.4);
             border-radius: 4px;
-            opacity: 0.3; /* Always slightly visible */
+            opacity: 0.3;
+            /* Always slightly visible */
             transition: all 0.2s;
             pointer-events: none;
             box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
         }
 
-        .resizer:hover::before, .resizer.active::before {
+        .resizer:hover::before,
+        .resizer.active::before {
             opacity: 1;
             height: 60px;
             background: #fff;
@@ -891,7 +896,8 @@
                         title="Participants">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20"
                             fill="currentColor">
-                            <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
+                            <path
+                                d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
                         </svg>
                         <span id="participant-count-badge" class="ml-0.5 text-[10px] text-zinc-500 font-bold">0</span>
                     </button>
@@ -1254,7 +1260,8 @@
                 <div class="w-8 h-8 rounded-lg bg-white/[0.06] flex items-center justify-center">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-zinc-400" viewBox="0 0 20 20"
                         fill="currentColor">
-                        <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
+                        <path
+                            d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
                     </svg>
                 </div>
                 <div>
@@ -2001,7 +2008,7 @@
         // Handle server errors
         socket.on('error-msg', (msg) => {
             showNotification(msg, 'error');
-            
+
             // If we're stuck in editor view without a state, go back home
             if (dom.editor.style.display === 'flex' && !htmlEditor.getValue()) {
                 leaveRoom();
@@ -2311,7 +2318,7 @@
         // ─── Participants Display ──────────────────────────────────
         function updateParticipants(participants) {
             currentParticipants = participants;
-            
+
             // Update badge and count text
             if (dom.participantCountBadge) dom.participantCountBadge.textContent = participants.length;
             if (dom.participantOnlineCount) dom.participantOnlineCount.textContent = `${participants.length} member${participants.length !== 1 ? 's' : ''} present`;
@@ -2340,15 +2347,15 @@
                     const isMe = p.uid === localUser.uid;
                     const item = document.createElement('div');
                     item.className = 'flex items-center justify-between bg-white/[0.03] border border-white/[0.06] p-3 rounded-xl hover:border-white/[0.1] transition-all';
-                    
+
                     const left = document.createElement('div');
                     left.className = 'flex items-center gap-3';
-                    
+
                     const avatar = document.createElement('div');
                     avatar.className = 'w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-lg';
                     avatar.style.backgroundColor = getCursorColor(p.uid);
                     avatar.textContent = p.name.charAt(0).toUpperCase();
-                    
+
                     const info = document.createElement('div');
                     const name = document.createElement('div');
                     name.className = 'text-sm font-semibold text-white flex items-center gap-2';
@@ -2359,26 +2366,26 @@
                         badge.textContent = 'You';
                         name.appendChild(badge);
                     }
-                    
+
                     const status = document.createElement('div');
                     status.className = 'text-[10px] text-zinc-500 font-medium';
                     status.textContent = 'Active now';
-                    
+
                     info.appendChild(name);
                     info.appendChild(status);
                     left.appendChild(avatar);
                     left.appendChild(info);
                     item.appendChild(left);
-                    
+
                     if (!isMe) {
                         const right = document.createElement('div');
                         right.className = 'flex flex-col items-end gap-1.5';
-                        
+
                         const voteBtn = document.createElement('button');
                         const voteData = activeVotes[p.uid] || { count: 0, required: Math.max(2, Math.ceil(participants.length / 2)) };
-                        
+
                         const hasVoted = false; // We don't track who voted specifically on client yet, but we could
-                        
+
                         voteBtn.className = `px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${voteData.count > 0 ? 'bg-red-500 text-white border-red-500' : 'bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20'}`;
                         voteBtn.innerHTML = `
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
@@ -2387,11 +2394,11 @@
                             Vote Kick (${voteData.count}/${voteData.required})
                         `;
                         voteBtn.onclick = () => voteKick(p.uid);
-                        
+
                         right.appendChild(voteBtn);
                         item.appendChild(right);
                     }
-                    
+
                     dom.participantsFullList.appendChild(item);
                 });
             }
@@ -2427,7 +2434,7 @@
             if (isAiOpen) {
                 const chatPanel = document.getElementById('chat-panel');
                 if (chatPanel && chatPanel.classList.contains('active')) toggleChat();
-                
+
                 const notifPanel = document.getElementById('notif-panel');
                 if (notifPanel && notifPanel.classList.contains('active')) toggleNotifications();
 
@@ -2459,7 +2466,7 @@
                 // Exclusive panels: Close others
                 const aiPanel = document.getElementById('ai-panel');
                 if (aiPanel && aiPanel.classList.contains('active')) toggleAi();
-                
+
                 const notifPanel = document.getElementById('notif-panel');
                 if (notifPanel && notifPanel.classList.contains('active')) toggleNotifications();
 
@@ -2490,7 +2497,7 @@
                 // Exclusive panels: Close others
                 const chatPanel = document.getElementById('chat-panel');
                 if (chatPanel && chatPanel.classList.contains('active')) toggleChat();
-                
+
                 const aiPanel = document.getElementById('ai-panel');
                 if (aiPanel && aiPanel.classList.contains('active')) toggleAi();
 
@@ -2512,13 +2519,13 @@
                 // Exclusive panels: Close others
                 const chatPanel = document.getElementById('chat-panel');
                 if (chatPanel && chatPanel.classList.contains('active')) toggleChat();
-                
+
                 const aiPanel = document.getElementById('ai-panel');
                 if (aiPanel && aiPanel.classList.contains('active')) toggleAi();
 
                 const notifPanel = document.getElementById('notif-panel');
                 if (notifPanel && notifPanel.classList.contains('active')) toggleNotifications();
-                
+
                 updateParticipants(currentParticipants);
             }
         }
@@ -2531,7 +2538,7 @@
                 // Ensure we handle both mouse and touch events
                 const event = e.touches ? e.touches[0] : e;
                 if (e.cancelable) e.preventDefault();
-                
+
                 isResizing = true;
                 dom.resizer.classList.add('active');
                 document.body.classList.add('resizing');
@@ -2540,12 +2547,12 @@
             const doResize = (e) => {
                 if (!isResizing) return;
                 const event = e.touches ? e.touches[0] : e;
-                
+
                 const wrapper = dom.contentWrapper.getBoundingClientRect();
                 const clientX = event.clientX;
                 const editorWidth = clientX - wrapper.left;
                 const outputWidth = wrapper.width - editorWidth - dom.resizer.offsetWidth;
-                
+
                 // Keep both panels at a reasonable minimum width
                 if (editorWidth > 100 && outputWidth > 100) {
                     dom.editorPanel.style.flexBasis = `${editorWidth}px`;
