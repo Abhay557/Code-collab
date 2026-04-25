@@ -48,6 +48,10 @@ Codependal is engineered to enable seamless, latency-free pair programming and t
   
 ![Timeline Diff Viewer Placeholder](timepreview.png)
 
+
+![Timeline Diff Viewer Placeholder](diffpreview1.png)
+![Timeline Diff Viewer Placeholder](diffpreview2.png)
+
 - **Activity Notification Center:** A real-time notification feed tracks user presence, snapshot generation, and major code edits. A red notification badge alerts you via the platform's header.
 
 ![Activity Notification Feed Placeholder](notification.png)
