@@ -224,28 +224,17 @@ function stringToColor(s) {
 // 4. THEME & WORKSPACE SWITCHERS
 // ==========================================
 
-/**
- * Sets initial application visual mode.
- */
 function initializeTheme() {
-    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        document.documentElement.classList.add('dark');
-    } else {
-        document.documentElement.classList.remove('dark');
-    }
+    document.documentElement.classList.add('dark');
+    localStorage.theme = 'dark';
 }
 
 /**
  * Toggles and records dark/light system variables.
  */
 function toggleTheme() {
-    if (document.documentElement.classList.contains('dark')) {
-        document.documentElement.classList.remove('dark');
-        localStorage.theme = 'light';
-    } else {
-        document.documentElement.classList.add('dark');
-        localStorage.theme = 'dark';
-    }
+    document.documentElement.classList.add('dark');
+    localStorage.theme = 'dark';
 }
 
 /**

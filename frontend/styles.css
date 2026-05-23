@@ -11,68 +11,6 @@
     --font-body: 'Roboto', sans-serif;
     --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 
-    /* Theme Colors: Light Mode (Pure Black & White Minimalist) */
-    --bg-primary: #ffffff;
-    --bg-secondary: #f4f4f5;
-    --bg-panel: rgba(255, 255, 255, 0.8);
-    --bg-header: rgba(255, 255, 255, 0.85);
-    
-    --text-primary: #000000;
-    --text-secondary: #18181b;
-    --text-muted: #71717a;
-    
-    --border-color: #e4e4e7;
-    --border-hover: #000000;
-    
-    /* Buttons */
-    --btn-primary-bg: #000000;
-    --btn-primary-text: #ffffff;
-    --btn-primary-hover-bg: #27272a;
-    --btn-primary-border: #000000;
-    
-    --btn-secondary-bg: transparent;
-    --btn-secondary-text: #000000;
-    --btn-secondary-border: #cbd5e1;
-    --btn-secondary-hover-bg: #f4f4f5;
-    
-    /* Inputs */
-    --input-bg: #ffffff;
-    --input-text: #000000;
-    --input-placeholder: #a1a1aa;
-    --input-border: #d4d4d8;
-    --input-focus-border: #000000;
-    --input-focus-shadow: rgba(0, 0, 0, 0.05);
-    
-    /* Cards & Glass Panels */
-    --card-bg: #ffffff;
-    --card-border: #e4e4e7;
-    --card-hover-border: #000000;
-    --card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03);
-    
-    /* Editors & Output */
-    --editor-gutter-bg: #fafafa;
-    --editor-gutter-border: #e4e4e7;
-    
-    /* Chat & AI Popups */
-    --chat-bubble-self-bg: #000000;
-    --chat-bubble-self-text: #ffffff;
-    --chat-bubble-self-border: #000000;
-    --chat-bubble-other-bg: #f4f4f5;
-    --chat-bubble-other-text: #000000;
-    --chat-bubble-other-border: #e4e4e7;
-    
-    --ai-prompt-bg: #f4f4f5;
-    --ai-prompt-text: #000000;
-    --ai-prompt-border: #e4e4e7;
-    
-    --ai-response-bg: #ffffff;
-    --ai-response-text: #000000;
-    --ai-response-border: #e4e4e7;
-    
-    --accent-glow: rgba(0, 0, 0, 0.05);
-}
-
-.dark {
     /* Theme Colors: Dark Mode (Pure Black & White Minimalist) */
     --bg-primary: #000000;
     --bg-secondary: #09090b;
@@ -703,20 +641,20 @@ h1, h2, h3, h4, h5, h6 {
 /* Drag Handle Component (Vertical Split Resizer) */
 .resizer {
     background: var(--border-color);
-    width: 6px;
+    width: 2px;
     cursor: col-resize;
     flex-shrink: 0;
     z-index: 100;
-    transition: background 0.2s, width 0.2s;
+    transition: background 0.2s, width 0.2s, box-shadow 0.2s;
     position: relative;
-    margin: 0 -3px;
+    margin: 0;
 }
 
 .resizer:hover,
 .resizer.active {
     background: var(--text-primary);
-    width: 6px;
-    box-shadow: 0 0 10px var(--accent-glow);
+    width: 2px;
+    box-shadow: 0 0 8px var(--text-primary);
 }
 
 /* Expanded Hit Area */
@@ -725,33 +663,17 @@ h1, h2, h3, h4, h5, h6 {
     position: absolute;
     top: 0;
     bottom: 0;
-    left: -15px;
-    right: -15px;
+    left: -10px;
+    right: -10px;
     z-index: 1;
     cursor: col-resize;
 }
 
-/* Visual drag indicator knob (vertical style) */
-.resizer::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 2px;
-    height: 36px;
-    background: var(--text-muted);
-    border-radius: 4px;
-    opacity: 0.4;
-    transition: all 0.2s;
-    pointer-events: none;
-}
-
-.resizer:hover::before,
-.resizer.active::before {
-    opacity: 1;
-    height: 50px;
-    background: #ffffff;
+/* Dropdown Option Dark Theme Style Fix */
+#theme-selector option {
+    background-color: #09090b !important;
+    color: #ffffff !important;
+    font-weight: 500;
 }
 
 .resizing {
@@ -840,16 +762,5 @@ h1, h2, h3, h4, h5, h6 {
 .w-5\.5 { width: 1.375rem !important; }
 .h-5\.5 { height: 1.375rem !important; }
 
-/* Solarized Light Theme Polish Override */
-.cm-s-solarized.CodeMirror {
-    background-color: #fdf6e3 !important;
-    color: #657b83 !important;
-}
-.cm-s-solarized .CodeMirror-gutters {
-    background-color: #eee8d5 !important;
-    border-right: 1px solid #dcd6c2 !important;
-}
-.cm-s-solarized .CodeMirror-linenumber {
-    color: #93a1a1 !important;
-}
+
 

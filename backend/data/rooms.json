@@ -271,44 +271,49 @@
     "createdAt": "2026-05-23T17:01:16.748Z",
     "votes": {}
   },
-  "bhjooyx": {
-    "roomId": "bhjooyx",
+  "63jqi5v": {
+    "roomId": "63jqi5v",
     "html": "<h1>Welcome!</h1>\n<p>Start coding and see your changes live.</p>",
     "css": "body {\n  font-family: sans-serif;\n  padding: 1em;\n}",
     "js": "console.log(\"Hello from your new room!\");",
-    "isPublic": false,
+    "isPublic": true,
     "participants": [],
     "messages": [],
     "consoleLogs": [
       {
         "type": "log",
         "message": "Hello from your new room!",
-        "timestamp": 1779558262765
+        "timestamp": 1779560349445
       }
     ],
     "kickedUids": [],
     "history": [],
-    "createdAt": "2026-05-23T17:44:22.278Z",
+    "createdAt": "2026-05-23T18:19:09.233Z",
     "votes": {}
   },
-  "or0id7x": {
-    "roomId": "or0id7x",
+  "u0wuwpd": {
+    "roomId": "u0wuwpd",
     "html": "<h1>Welcome!</h1>\n<p>Start coding and see your changes live.</p>",
     "css": "body {\n  font-family: sans-serif;\n  padding: 1em;\n}",
     "js": "console.log(\"Hello from your new room!\");",
-    "isPublic": false,
-    "participants": [],
+    "isPublic": true,
+    "participants": [
+      {
+        "uid": "6d43f954-bd9e-4004-b70d-3332f1a40e36",
+        "name": "fdsfsdf"
+      }
+    ],
     "messages": [],
     "consoleLogs": [
       {
         "type": "log",
         "message": "Hello from your new room!",
-        "timestamp": 1779558472452
+        "timestamp": 1779560690006
       }
     ],
     "kickedUids": [],
     "history": [],
-    "createdAt": "2026-05-23T17:47:52.024Z",
+    "createdAt": "2026-05-23T18:24:49.960Z",
     "votes": {}
   }
 }
