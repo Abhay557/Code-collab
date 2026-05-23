@@ -6,21 +6,128 @@ const rateLimit = require('express-rate-limit');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
-
-try {
-    fs.writeFileSync('debug_extraction.log', `SERVER STARTUP AT ${new Date().toISOString()}\n`);
-} catch (e) { console.error('Failed to write debug log', e); }
+const crypto = require('crypto');
 
 const PORT = process.env.PORT || 3000;
 
 // ─── Constants ────────────────────────────────────────────────────────
 const MAX_ROOM_CAPACITY = 6;
 
-// ─── In-Memory Room Store ─────────────────────────────────────────────
-const rooms = new Map();
+// ─── Input Validation Constants ───────────────────────────────────────
+const MAX_CODE_SIZE = 500 * 1024; // 500KB per language
+const MAX_CHAT_LENGTH = 2000;
+const MAX_NAME_LENGTH = 30;
+const ROOM_ID_REGEX = /^[a-z0-9]{5,10}$/;
+
+// ─── CORS Allowlist ───────────────────────────────────────────────────
+const ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+    'http://localhost:5500',
+    'http://127.0.0.1:5500',
+    'http://localhost:5173',
+    process.env.FRONTEND_URL
+].filter(Boolean);
+
+// ─── Persistent Room Store ────────────────────────────────────────────
+class RoomStore {
+    constructor(filePath) {
+        this.filePath = filePath;
+        this.rooms = new Map();
+        this._saveTimer = null;
+        this._saveDelay = 2000; // 2 second debounce
+
+        // Ensure the data directory exists
+        const dir = path.dirname(this.filePath);
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+        }
+
+        // Load from disk on startup
+        this._loadSync();
+    }
+
+    _loadSync() {
+        try {
+            if (fs.existsSync(this.filePath)) {
+                const raw = fs.readFileSync(this.filePath, 'utf-8');
+                const data = JSON.parse(raw);
+                for (const [roomId, roomData] of Object.entries(data)) {
+                    // Restore votes from arrays back to Sets
+                    const votes = {};
+                    if (roomData.votes) {
+                        for (const [targetUid, voterArray] of Object.entries(roomData.votes)) {
+                            votes[targetUid] = new Set(voterArray);
+                        }
+                    }
+                    this.rooms.set(roomId, {
+                        ...roomData,
+                        votes,
+                        participants: [],       // Connections are lost on restart
+                        historyTimer: null       // setTimeout refs can't be serialized
+                    });
+                }
+                console.log(`📂 Loaded ${this.rooms.size} room(s) from ${this.filePath}`);
+            }
+        } catch (err) {
+            console.error('⚠️  Failed to load rooms from disk:', err.message);
+        }
+    }
+
+    _serialize() {
+        const obj = {};
+        for (const [roomId, room] of this.rooms.entries()) {
+            // Convert votes Sets to arrays for JSON serialization
+            const votesObj = {};
+            if (room.votes) {
+                for (const [targetUid, voterSet] of Object.entries(room.votes)) {
+                    votesObj[targetUid] = Array.from(voterSet);
+                }
+            }
+            // Skip historyTimer (non-serializable setTimeout ref)
+            const { historyTimer, votes, ...rest } = room;
+            obj[roomId] = { ...rest, votes: votesObj };
+        }
+        return JSON.stringify(obj, null, 2);
+    }
+
+    save() {
+        // Debounced save — coalesces rapid mutations
+        if (this._saveTimer) clearTimeout(this._saveTimer);
+        this._saveTimer = setTimeout(() => {
+            try {
+                fs.writeFileSync(this.filePath, this._serialize(), 'utf-8');
+            } catch (err) {
+                console.error('⚠️  Failed to persist rooms:', err.message);
+            }
+        }, this._saveDelay);
+    }
+
+    get(roomId) {
+        return this.rooms.get(roomId) || null;
+    }
+
+    set(roomId, room) {
+        this.rooms.set(roomId, room);
+    }
+
+    delete(roomId) {
+        this.rooms.delete(roomId);
+        this.save();
+    }
+
+    forEach(fn) {
+        this.rooms.forEach(fn);
+    }
+
+    get size() {
+        return this.rooms.size;
+    }
+}
+
+const store = new RoomStore(path.join(__dirname, 'data', 'rooms.json'));
 
 function getRoomData(roomId) {
-    return rooms.get(roomId) || null;
+    return store.get(roomId);
 }
 
 function createRoom(roomId, isPublic) {
@@ -39,7 +146,8 @@ function createRoom(roomId, isPublic) {
         historyTimer: null,     // Debounce timer for snapshots
         createdAt: new Date()
     };
-    rooms.set(roomId, room);
+    store.set(roomId, room);
+    store.save();
     return room;
 }
 
@@ -48,13 +156,13 @@ const app = express();
 app.set('trust proxy', 1); // Trust first proxy (Render, Railway, etc.)
 const server = http.createServer(app);
 const io = new Server(server, {
-    cors: { origin: '*', methods: ['GET', 'POST'] },
+    cors: { origin: ALLOWED_ORIGINS, methods: ['GET', 'POST'], credentials: true },
     pingTimeout: 60000,
     pingInterval: 25000
 });
 
 // ─── Middleware ────────────────────────────────────────────────────────
-app.use(cors());
+app.use(cors({ origin: ALLOWED_ORIGINS, credentials: true }));
 app.use(express.json());
 // app.use(express.static(path.join(__dirname, 'public'))); // Removed since frontend is split
 
@@ -70,6 +178,12 @@ app.use('/api', apiLimiter);
 // Create a room
 app.post('/api/rooms', (req, res) => {
     const { isPublic } = req.body;
+
+    // Validate isPublic is a boolean
+    if (typeof isPublic !== 'undefined' && typeof isPublic !== 'boolean') {
+        return res.status(400).json({ error: 'isPublic must be a boolean.' });
+    }
+
     const roomId = Math.random().toString(36).substring(2, 9);
     const room = createRoom(roomId, !!isPublic);
     res.json({ roomId, room });
@@ -78,7 +192,7 @@ app.post('/api/rooms', (req, res) => {
 // Check if a room exists (this MUST come before /api/rooms/random/public)
 app.get('/api/rooms/random/public', (req, res) => {
     const publicRooms = [];
-    rooms.forEach((room, id) => {
+    store.forEach((room, id) => {
         if (room.isPublic && room.participants.length < MAX_ROOM_CAPACITY) {
             publicRooms.push(id);
         }
@@ -157,11 +271,6 @@ const cleanCode = (code, type) => {
 // ─── AI Response Parser ───────────────────────────────────────────────
 
 function parseCodeBlocks(text) {
-    console.log('--- RAW AI RESPONSE ---');
-    console.log(text);
-    console.log('-----------------------');
-    try { fs.writeFileSync('debug_ai_response.txt', text); } catch (e) { }
-
     const result = { html: null, css: null, js: null };
     const blockRegex = /```(\w*)\s*\n([\s\S]*?)```/g;
     let match;
@@ -222,24 +331,40 @@ io.on('connection', (socket) => {
 
     // Join a room
     socket.on('join-room', ({ roomId, user }) => {
+        // ── Input Validation ──
+        if (!roomId || typeof roomId !== 'string' || !ROOM_ID_REGEX.test(roomId)) {
+            socket.emit('error-msg', 'Invalid room ID format.');
+            return;
+        }
+        if (!user || typeof user.name !== 'string') {
+            socket.emit('error-msg', 'Invalid user data.');
+            return;
+        }
+        const validatedName = user.name.trim();
+        if (validatedName.length < 1 || validatedName.length > MAX_NAME_LENGTH) {
+            socket.emit('error-msg', `Name must be between 1 and ${MAX_NAME_LENGTH} characters.`);
+            return;
+        }
+
         const room = getRoomData(roomId);
         if (!room) {
             socket.emit('error-msg', 'Room not found.');
             return;
         }
 
-        // Check if kicked
-        if (room.kickedUids.includes(user.uid)) {
+        // ── Server-side UID Generation ──
+        const serverUid = crypto.randomUUID();
+        const serverUser = { uid: serverUid, name: validatedName };
+
+        // Check if kicked (by name, since UIDs are now server-generated)
+        if (room.kickedUids.includes(serverUid)) {
             socket.emit('error-msg', 'You have been kicked from this room.');
             return;
         }
 
         currentRoom = roomId;
-        currentUser = user;
+        currentUser = serverUser;
         socket.join(roomId);
-
-        // Add participant (avoid duplicates by uid)
-        room.participants = room.participants.filter(p => p.uid !== user.uid);
 
         // Check capacity
         if (room.participants.length >= MAX_ROOM_CAPACITY) {
@@ -247,10 +372,12 @@ io.on('connection', (socket) => {
             return;
         }
 
-        room.participants.push(user);
+        room.participants.push(serverUser);
+        store.save();
 
-        // Send full room state to the joining user
+        // Send full room state to the joining user (includes server-assigned UID)
         socket.emit('room-state', {
+            uid: serverUid,
             html: room.html,
             css: room.css,
             js: room.js,
@@ -262,16 +389,21 @@ io.on('connection', (socket) => {
         io.to(roomId).emit('participants-update', room.participants);
 
         // Notify others that a user joined
-        socket.to(roomId).emit('activity', { type: 'join', user: user.name, timestamp: new Date().toISOString() });
+        socket.to(roomId).emit('activity', { type: 'join', user: serverUser.name, timestamp: new Date().toISOString() });
     });
 
     // Code change
     socket.on('code-change', ({ roomId, lang, value }) => {
+        // ── Input Validation ──
+        if (!lang || !['html', 'css', 'js'].includes(lang)) return;
+        if (typeof value !== 'string' || value.length > MAX_CODE_SIZE) return;
+
         const room = getRoomData(roomId);
         if (!room) return;
 
         // Update the room data
         room[lang] = value;
+        store.save();
 
         // Broadcast to everyone EXCEPT the sender
         socket.to(roomId).emit('code-update', { lang, value });
@@ -291,6 +423,7 @@ io.on('connection', (socket) => {
             });
             // Cap at 50 entries
             if (room.history.length > 50) room.history.shift();
+            store.save();
         }, 10000);
     });
 
@@ -319,17 +452,23 @@ io.on('connection', (socket) => {
 
     // Chat message
     socket.on('send-message', ({ roomId, text }) => {
+        // ── Input Validation ──
+        if (typeof text !== 'string') return;
+        const trimmedText = text.trim();
+        if (trimmedText.length < 1 || trimmedText.length > MAX_CHAT_LENGTH) return;
+
         const room = getRoomData(roomId);
         if (!room || !currentUser) return;
 
         const message = {
-            text,
+            text: trimmedText,
             senderName: currentUser.name,
             senderUid: currentUser.uid,
             timestamp: new Date().toISOString()
         };
 
         room.messages.push(message);
+        store.save();
 
         // Broadcast to EVERYONE in the room (including sender)
         io.to(roomId).emit('new-message', message);
@@ -464,6 +603,7 @@ CRITICAL RULES:
 
         // Add voter
         room.votes[targetUid].add(currentUser.uid);
+        store.save();
 
         const currentVotes = room.votes[targetUid].size;
         const requiredVotes = Math.max(2, Math.ceil(room.participants.length / 2));
@@ -482,6 +622,7 @@ CRITICAL RULES:
             room.kickedUids.push(targetUid);
             room.participants = room.participants.filter(p => p.uid !== targetUid);
             delete room.votes[targetUid];
+            store.save();
 
             // Notify everyone
             io.to(roomId).emit('user-kicked', { uid: targetUid, name: target.name });
@@ -597,6 +738,7 @@ Respond with ONLY the review feedback as plain text with bullet points. No code 
         });
 
         if (room.history.length > 50) room.history.shift();
+        store.save();
 
         // Broadcast updated history right away
         io.to(roomId).emit('history-list', room.history);
@@ -621,6 +763,7 @@ Respond with ONLY the review feedback as plain text with bullet points. No code 
         room.html = snapshot.html;
         room.css = snapshot.css;
         room.js = snapshot.js;
+        store.save();
 
         // Broadcast restored state to all users
         io.to(roomId).emit('room-state', {
@@ -654,6 +797,7 @@ Respond with ONLY the review feedback as plain text with bullet points. No code 
 
                 room.participants = room.participants.filter(p => p.uid !== currentUser.uid);
                 io.to(currentRoom).emit('participants-update', room.participants);
+                store.save();
 
                 // Clean up empty rooms after 5 minutes
                 if (room.participants.length === 0) {
@@ -661,7 +805,7 @@ Respond with ONLY the review feedback as plain text with bullet points. No code 
                     setTimeout(() => {
                         const check = getRoomData(roomToClean);
                         if (check && check.participants.length === 0) {
-                            rooms.delete(roomToClean);
+                            store.delete(roomToClean);
                             console.log(`🗑️  Room ${roomToClean} cleaned up (empty).`);
                         }
                     }, 5 * 60 * 1000);
@@ -676,7 +820,8 @@ Respond with ONLY the review feedback as plain text with bullet points. No code 
 
 // ─── Start Server ─────────────────────────────────────────────────────
 server.listen(PORT, () => {
-    console.log(`\n🚀 Code Collab server running on http://localhost:${PORT}`);
-    console.log(`⚡ Socket.IO ready for real-time connections`);
-    console.log(`🛡️  Rate limiting: 60 requests/min per IP\n`);
+    console.log(`\n Code Collab server running on http://localhost:${PORT}`);
+    console.log(` Socket.IO ready for real-time connections`);
+    console.log(`  Rate limiting: 60 requests/min per IP`);
+    console.log(` Room persistence: ${path.join(__dirname, 'data', 'rooms.json')}\n`);
 });

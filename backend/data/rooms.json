@@ -1,0 +1,228 @@
+{
+  "v5u7gfv": {
+    "roomId": "v5u7gfv",
+    "html": "<h1>Welcome!</h1>\n<p>Start coding and see your changes live.</p>",
+    "css": "body {\n  font-family: sans-serif;\n  padding: 1em;\n}",
+    "js": "console.log(\"Hello from your new room!\");",
+    "isPublic": false,
+    "participants": [],
+    "messages": [],
+    "consoleLogs": [],
+    "kickedUids": [],
+    "history": [],
+    "createdAt": "2026-05-23T12:27:48.713Z",
+    "votes": {}
+  },
+  "6k3m69j": {
+    "roomId": "6k3m69j",
+    "html": "<h1>Welcome!</h1>\n<p>Start coding and see your changes live.</p>",
+    "css": "body {\n  font-family: sans-serif;\n  padding: 1em;\n}",
+    "js": "console.log(\"Hello from your new room!\");",
+    "isPublic": false,
+    "participants": [],
+    "messages": [],
+    "consoleLogs": [],
+    "kickedUids": [],
+    "history": [],
+    "createdAt": "2026-05-23T12:28:05.269Z",
+    "votes": {}
+  },
+  "hre8xls": {
+    "roomId": "hre8xls",
+    "html": "<h1>Welcome!</h1>\n<p>Start coding and see your changes live.</p>",
+    "css": "body {\n  font-family: sans-serif;\n  padding: 1em;\n}",
+    "js": "console.log(\"Hello from your new room!\");",
+    "isPublic": false,
+    "participants": [],
+    "messages": [],
+    "consoleLogs": [],
+    "kickedUids": [],
+    "history": [],
+    "createdAt": "2026-05-23T12:28:16.606Z",
+    "votes": {}
+  },
+  "jmbxu42": {
+    "roomId": "jmbxu42",
+    "html": "<h1>Welcome!</h1>\n<p>Start coding and see your changes live.</p>",
+    "css": "body {\n  font-family: sans-serif;\n  padding: 1em;\n}",
+    "js": "console.log(\"Hello from your new room!\");",
+    "isPublic": false,
+    "participants": [],
+    "messages": [],
+    "consoleLogs": [],
+    "kickedUids": [],
+    "history": [],
+    "createdAt": "2026-05-23T12:28:29.066Z",
+    "votes": {}
+  },
+  "6wagsmz": {
+    "roomId": "6wagsmz",
+    "html": "<h1>Welcome!</h1>\n<p>Start coding and see your changes live.</p>sssss",
+    "css": "body {\n  font-family: sans-serif;\n  padding: 1em;\n}",
+    "js": "console.log(\"Hello from your new room!\");",
+    "isPublic": true,
+    "participants": [
+      {
+        "uid": "5a4a66af-90fa-4569-b4ec-318707c05aae",
+        "name": "ss"
+      }
+    ],
+    "messages": [],
+    "consoleLogs": [
+      {
+        "type": "error",
+        "message": "Uncaught SyntaxError: Unexpected end of input",
+        "timestamp": 1779540163961
+      },
+      {
+        "type": "log",
+        "message": "Hello from your new room!",
+        "timestamp": 1779540164148
+      },
+      {
+        "type": "error",
+        "message": "Uncaught SyntaxError: Unexpected end of input",
+        "timestamp": 1779540164346
+      },
+      {
+        "type": "log",
+        "message": "Hello from your new room!",
+        "timestamp": 1779540164561
+      },
+      {
+        "type": "error",
+        "message": "Uncaught SyntaxError: Unexpected end of input",
+        "timestamp": 1779540165284
+      },
+      {
+        "type": "log",
+        "message": "Hello from your new room!",
+        "timestamp": 1779540165818
+      },
+      {
+        "type": "error",
+        "message": "Uncaught SyntaxError: Unexpected end of input",
+        "timestamp": 1779540166358
+      },
+      {
+        "type": "log",
+        "message": "Hello from your new room!",
+        "timestamp": 1779540167631
+      },
+      {
+        "type": "error",
+        "message": "Uncaught SyntaxError: Unexpected end of input",
+        "timestamp": 1779540175703
+      },
+      {
+        "type": "log",
+        "message": "Hello from your new room!",
+        "timestamp": 1779540406250
+      },
+      {
+        "type": "error",
+        "message": "Uncaught SyntaxError: Unexpected end of input",
+        "timestamp": 1779540411406
+      },
+      {
+        "type": "log",
+        "message": "Hello from your new room!",
+        "timestamp": 1779540532027
+      },
+      {
+        "type": "log",
+        "message": "Hello from your new room!",
+        "timestamp": 1779540546929
+      },
+      {
+        "type": "error",
+        "message": "Uncaught SyntaxError: Unexpected end of input",
+        "timestamp": 1779540548578
+      },
+      {
+        "type": "log",
+        "message": "Hello from your new room!",
+        "timestamp": 1779540568611
+      },
+      {
+        "type": "error",
+        "message": "Uncaught SyntaxError: Unexpected end of input",
+        "timestamp": 1779540570297
+      },
+      {
+        "type": "log",
+        "message": "Hello from your new room!",
+        "timestamp": 1779540696370
+      },
+      {
+        "type": "error",
+        "message": "Uncaught SyntaxError: Unexpected end of input",
+        "timestamp": 1779540697970
+      },
+      {
+        "type": "log",
+        "message": "Hello from your new room!",
+        "timestamp": 1779540729046
+      },
+      {
+        "type": "error",
+        "message": "Uncaught SyntaxError: Unexpected end of input",
+        "timestamp": 1779540730423
+      },
+      {
+        "type": "log",
+        "message": "Hello from your new room!",
+        "timestamp": 1779540734385
+      },
+      {
+        "type": "error",
+        "message": "Uncaught SyntaxError: Unexpected end of input",
+        "timestamp": 1779540735382
+      },
+      {
+        "type": "log",
+        "message": "Hello from your new room!",
+        "timestamp": 1779540736875
+      },
+      {
+        "type": "error",
+        "message": "Uncaught SyntaxError: Unexpected end of input",
+        "timestamp": 1779540739266
+      },
+      {
+        "type": "log",
+        "message": "Hello from your new room!",
+        "timestamp": 1779540740493
+      },
+      {
+        "type": "error",
+        "message": "Uncaught SyntaxError: Unexpected end of input",
+        "timestamp": 1779540749950
+      },
+      {
+        "type": "log",
+        "message": "Hello from your new room!",
+        "timestamp": 1779540753392
+      },
+      {
+        "type": "error",
+        "message": "Uncaught SyntaxError: Unexpected end of input",
+        "timestamp": 1779540754959
+      },
+      {
+        "type": "log",
+        "message": "Hello from your new room!",
+        "timestamp": 1779540756614
+      },
+      {
+        "type": "log",
+        "message": "Hello from your new room!",
+        "timestamp": 1779540770412
+      }
+    ],
+    "kickedUids": [],
+    "history": [],
+    "createdAt": "2026-05-23T12:42:10.886Z",
+    "votes": {}
+  }
+}
