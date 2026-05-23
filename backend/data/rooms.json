@@ -61,12 +61,7 @@
     "css": "body {\n  font-family: sans-serif;\n  padding: 1em;\n}",
     "js": "console.log(\"Hello from your new room!\");",
     "isPublic": true,
-    "participants": [
-      {
-        "uid": "5a4a66af-90fa-4569-b4ec-318707c05aae",
-        "name": "ss"
-      }
-    ],
+    "participants": [],
     "messages": [],
     "consoleLogs": [
       {
