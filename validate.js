@@ -1,5 +1,5 @@
 const fs = require('fs');
-const html = fs.readFileSync('public/index.html', 'utf8');
+const html = fs.readFileSync('frontend/index.html', 'utf8');
 const lines = html.split('\n');
 
 // Find lines 1306 to 1922 (the main script block)

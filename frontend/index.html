@@ -85,7 +85,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
     <!-- Socket.IO Client -->
-    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
 
     <style>
         * {
@@ -1290,8 +1290,10 @@
         };
         // â”€â”€â”€ Socket.IO Connection â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-
-        const socket = io();
+        const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+            ? 'http://localhost:3000' 
+            : 'https://codecollab-backend-ya9c.onrender.com'; // Change this to your live backend URL
+        const socket = io(BACKEND_URL);
 
         // â”€â”€â”€ Generate a random UID (replaces Firebase anonymous auth) â”€â”€â”€â”€â”€
         function generateUID() {
@@ -1467,7 +1469,7 @@
             localUser = { uid: generateUID(), name };
 
             try {
-                const res = await fetch('/api/rooms', {
+                const res = await fetch(`${BACKEND_URL}/api/rooms`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ isPublic })
@@ -1490,7 +1492,7 @@
             showNotification("Finding a public room...", "info");
 
             try {
-                const res = await fetch('/api/rooms/random/public');
+                const res = await fetch(`${BACKEND_URL}/api/rooms/random/public`);
                 if (res.ok) {
                     const data = await res.json();
                     handleJoinRoom(data.roomId);
@@ -1512,7 +1514,7 @@
 
         async function handleJoinRoom(roomId) {
             try {
-                const res = await fetch(`/api/rooms/${roomId}`);
+                const res = await fetch(`${BACKEND_URL}/api/rooms/${roomId}`);
                 if (!res.ok) {
                     showNotification("Room not found!");
                     window.location.hash = '';

@@ -56,7 +56,7 @@ const io = new Server(server, {
 // ─── Middleware ────────────────────────────────────────────────────────
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
+// app.use(express.static(path.join(__dirname, 'public'))); // Removed since frontend is split
 
 const apiLimiter = rateLimit({
     windowMs: 1 * 60 * 1000, // 1 minute
