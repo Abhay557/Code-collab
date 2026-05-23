@@ -227,5 +227,88 @@
     ],
     "createdAt": "2026-05-23T12:42:10.886Z",
     "votes": {}
+  },
+  "cdx4nrt": {
+    "roomId": "cdx4nrt",
+    "html": "<h1>Welcome!</h1>\n<p>Start coding and see your changes live.</p>x",
+    "css": "body {\n  font-family: sans-serif;\n  padding: 1em;\n}",
+    "js": "console.log(\"Hello from your new room!\");",
+    "isPublic": true,
+    "participants": [],
+    "messages": [],
+    "consoleLogs": [
+      {
+        "type": "log",
+        "message": "Hello from your new room!",
+        "timestamp": 1779555676968
+      },
+      {
+        "type": "log",
+        "message": "Hello from your new room!",
+        "timestamp": 1779556275219
+      },
+      {
+        "type": "log",
+        "message": "Hello from your new room!",
+        "timestamp": 1779556277911
+      },
+      {
+        "type": "log",
+        "message": "Hello from your new room!",
+        "timestamp": 1779556279411
+      }
+    ],
+    "kickedUids": [],
+    "history": [
+      {
+        "html": "<h1>Welcome!</h1>\n<p>Start coding and see your changes live.</p>x",
+        "css": "body {\n  font-family: sans-serif;\n  padding: 1em;\n}",
+        "js": "console.log(\"Hello from your new room!\");",
+        "timestamp": "2026-05-23T17:14:24.709Z",
+        "user": "zfzfz"
+      }
+    ],
+    "createdAt": "2026-05-23T17:01:16.748Z",
+    "votes": {}
+  },
+  "bhjooyx": {
+    "roomId": "bhjooyx",
+    "html": "<h1>Welcome!</h1>\n<p>Start coding and see your changes live.</p>",
+    "css": "body {\n  font-family: sans-serif;\n  padding: 1em;\n}",
+    "js": "console.log(\"Hello from your new room!\");",
+    "isPublic": false,
+    "participants": [],
+    "messages": [],
+    "consoleLogs": [
+      {
+        "type": "log",
+        "message": "Hello from your new room!",
+        "timestamp": 1779558262765
+      }
+    ],
+    "kickedUids": [],
+    "history": [],
+    "createdAt": "2026-05-23T17:44:22.278Z",
+    "votes": {}
+  },
+  "or0id7x": {
+    "roomId": "or0id7x",
+    "html": "<h1>Welcome!</h1>\n<p>Start coding and see your changes live.</p>",
+    "css": "body {\n  font-family: sans-serif;\n  padding: 1em;\n}",
+    "js": "console.log(\"Hello from your new room!\");",
+    "isPublic": false,
+    "participants": [],
+    "messages": [],
+    "consoleLogs": [
+      {
+        "type": "log",
+        "message": "Hello from your new room!",
+        "timestamp": 1779558472452
+      }
+    ],
+    "kickedUids": [],
+    "history": [],
+    "createdAt": "2026-05-23T17:47:52.024Z",
+    "votes": {}
   }
 }
