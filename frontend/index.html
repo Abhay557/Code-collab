@@ -4,68 +4,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Codependal - Real-time Collaborative IDE & AI Pair Programmer</title>
+    <title>Codependal - Real-time Collaborative IDE</title>
 
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="manifest" href="/site.webmanifest">
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+        <link rel="manifest" href="/site.webmanifest">
 
-    <meta name="description"
-        content="Collaborate on HTML, CSS, and JS in real-time. Code Collab is a premium in-browser collaborative IDE featuring instant sync, built-in chat, and an AI coding assistant.">
-    <meta property="og:title" content="Codependal - Real-time Collaborative Editor">
-    <meta property="og:description"
-        content="A free, premium, in-browser collaborative IDE for pair programming and live code sharing. Features instant preview and AI assistant.">
-    <meta property="og:image"
-        content="https://raw.githubusercontent.com/Abhay557/Code-Collab/refs/heads/main/preview.png">
-    <meta property="og:url" content="https://codependal.com/">
-    <meta property="og:type" content="website">
+        <meta name="description"
+            content="Collaborate on HTML, CSS, and JS in real-time. Code Collab is a in-browser collaborative IDE featuring instant sync, built-in chat, and an AI coding assistant.">
+        <meta property="og:title" content="Codependal - Real-time Collaborative Editor">
+        <meta property="og:description"
+            content="A free, in-browser collaborative IDE for pair programming and live code sharing. Features instant preview and AI assistant.">
+        <meta property="og:image"
+            content="https://raw.githubusercontent.com/Abhay557/Code-Collab/refs/heads/main/preview.png">
+        <meta property="og:url" content="https://codependal.com/">
+        <meta property="og:type" content="website">
 
-    <!-- TailWind CSS via CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        dark: '#030303'
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'system-ui', 'sans-serif'],
-                        mono: ['JetBrains Mono', 'Courier New', 'monospace'],
+        <!-- TailWind CSS via CDN -->
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script>
+            tailwind.config = {
+                darkMode: 'class',
+                theme: {
+                    extend: {
+                        colors: {
+                            dark: '#030303'
+                        },
+                        fontFamily: {
+                            sans: ['Inter', 'system-ui', 'sans-serif'],
+                            mono: ['JetBrains Mono', 'Courier New', 'monospace'],
+                        }
                     }
                 }
             }
-        }
-    </script>
+        </script>
+        <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Codependal",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Web",
+  "description": "A real-time collaborative web IDE featuring Socket.IO synchronization and a built-in Hugging Face AI assistant for code generation.",
+  "url": "https://codependal.com/",
+  "author": {
+    "@type": "Person",
+    "name": "Abhay Mourya",
+    "alternateName": "abhay557",
+    "url": "https://abhaymourya.com/"
+  }
+}
+  </script>
 
-    <!-- CodeMirror & Diff Engines -->
-    <script src="https://cdn.jsdelivr.net/npm/diff@5.2.0/dist/diff.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/codemirror.min.css">
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/theme/material-darker.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/theme/dracula.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/theme/monokai.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/theme/nord.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/theme/ayu-dark.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/theme/cobalt.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/theme/twilight.min.css">
+        <!-- CodeMirror & Diff Engines -->
+        <script src="https://cdn.jsdelivr.net/npm/diff@5.2.0/dist/diff.min.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/codemirror.min.css">
+        <link rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/theme/material-darker.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/theme/dracula.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/theme/monokai.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/theme/nord.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/theme/ayu-dark.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/theme/cobalt.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/theme/twilight.min.css">
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/codemirror.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/xml/xml.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/javascript/javascript.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/css/css.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/edit/closetag.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/codemirror.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/xml/xml.min.js"></script>
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/javascript/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/css/css.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/edit/closetag.min.js"></script>
 
-    <!-- JSZip for exporting projects -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+        <!-- JSZip for exporting projects -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
-    <!-- Socket.IO -->
-    <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+        <!-- Socket.IO -->
+        <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
 
-    <!-- Custom Stylings -->
-    <link rel="stylesheet" href="/styles.css?v=3">
+        <!-- Custom Stylings -->
+        <link rel="stylesheet" href="/styles.css?v=3">
 </head>
 
 <body
@@ -161,20 +179,14 @@
             <!-- Hero Section -->
             <div class="hero-section fade-in flex-grow flex flex-col justify-center">
                 <div class="max-w-3xl text-center px-4 relative z-20">
-                    <div
-                        class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-zinc-150 dark:bg-white/[0.04] border border-zinc-300 dark:border-white/[0.08] text-zinc-800 dark:text-zinc-300 text-xs font-semibold mb-6">
-                        <span class="w-1.5 h-1.5 rounded-full bg-zinc-800 dark:bg-white animate-pulse"></span>
-                        Engineering Collaborative Sandbox
-                    </div>
                     <h1
                         class="text-4xl sm:text-5xl md:text-6xl font-extrabold leading-[1.1] tracking-tight mb-6 text-zinc-900 dark:text-white">
-                        Sandboxed Playpen for Collaborative Front-End Engineering
+                        Build together,ship together!
                     </h1>
                     <p
                         class="text-zinc-650 dark:text-zinc-400 text-base md:text-lg leading-relaxed mb-10 max-w-xl mx-auto">
-                        A high-fidelity, zero-friction playground to build and review layouts in real-time. Sync cursor
-                        streams via low-latency Socket.IO, pipe sandbox runtime console exceptions, capture differential
-                        history checkpoints, and pair-program with a localized AI copilot.
+                        Codependal is a real-time collaborative IDE for front-end developers. Write HTML, CSS & JS
+                        together with live preview and AI-powered code assistance.
                     </p>
 
                     <!-- Primary Actions -->
@@ -322,9 +334,8 @@
             <div id="content-wrapper"
                 class="flex-grow flex flex-col md:flex-row gap-2 md:gap-0 p-2 overflow-hidden bg-zinc-100 dark:bg-dark">
 
-                <!-- ==================== PREMIUM TABBED EDITOR PANELS ==================== -->
                 <div id="editor-panel"
-                    class="flex flex-col flex-1 w-full md:w-auto h-1/2 md:h-auto min-h-0 bg-white dark:bg-[#0c0c0e] rounded-2xl overflow-hidden border border-zinc-200 dark:border-white/[0.06] shadow-sm">
+                    class="flex flex-col bg-white dark:bg-[#0c0c0e] rounded-2xl overflow-hidden border border-zinc-200 dark:border-white/[0.06] shadow-sm">
 
                     <!-- Editor Tab Bar Button System -->
                     <div class="editor-tabs-bar flex-shrink-0 flex items-center justify-between">
@@ -389,9 +400,8 @@
                 <!-- Window Split Resizer Handle -->
                 <div id="resizer" class="resizer hidden md:block"></div>
 
-                <!-- Output Panel (Live Iframe Sandbox) -->
                 <div id="output-panel"
-                    class="relative bg-white dark:bg-[#070708] rounded-2xl overflow-hidden flex-1 w-full md:w-auto h-1/2 md:h-auto min-h-0 border border-zinc-200 dark:border-white/[0.06] shadow-sm">
+                    class="relative bg-white dark:bg-[#070708] rounded-2xl overflow-hidden border border-zinc-200 dark:border-white/[0.06] shadow-sm">
                     <iframe id="output-frame" class="w-full h-full border-0 bg-white"></iframe>
 
                     <!-- Floating Preview Utility Control Center -->
